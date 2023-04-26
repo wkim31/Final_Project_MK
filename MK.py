@@ -7,7 +7,7 @@ pygame.init()
 WIDTH = 1000
 HEIGHT = 1000
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
-bg_image = pygame.image.load('fin_bg-mario-circuit-3.png')
+bg_image = pygame.image.load('fin_track-mariocircuit-3.png')
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 
 # Run until the user asks to quit
