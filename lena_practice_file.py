@@ -1,8 +1,8 @@
 #imports:
 import pygame
 from pygame.locals import *
-pygame.init()
 
+#Define game state:
 # Set up the drawing window
 WIDTH = 1000
 HEIGHT = 1000
@@ -13,6 +13,17 @@ bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 # finish line
 orange_car = pygame.image.load("images/orange-car.png") 
 green_car = pygame.image.load("images/green-car.png")
+
+#Classes:
+#class Player(pygame.sprite.Sprite): 
+
+
+
+
+#Initialize game:
+pygame.init()
+
+
 # title
 pygame.display.set_caption("Race Karting Game!")
 
