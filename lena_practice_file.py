@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import time
 import random
+from utils import scale_image, blit_rotate_center
 
 pygame.init()
 pygame.font.init()
@@ -18,7 +19,6 @@ mario_start = pygame.image.load('Mario-backside.png')
 # track border
 # finish line
 orange_car = pygame.image.load("images/orange-car.png") 
-green_car = pygame.image.load("images/green-car.png")
 
 #clock:
 clock = pygame.time.Clock()
@@ -29,6 +29,41 @@ white = (255, 255, 255)
 cadet_blue = (142, 229, 238)
 cyan = (0, 238, 238)
 # title
+class AbstractCar:
+    def __init__(self, max_vel, rotation_vel):
+        self.img = self.IMG
+        self.max_vel = max_vel
+        self.vel = 0
+        self.rotation_vel = rotation_vel
+        self.angle = 90
+        self.x, self.y = self.start_pos
+        self.acceleration = 0.5
+
+    def rotate(self, left=False, right=False):
+        if left:
+            self.angle += self.rotation_vel
+        elif right:
+            self.angle -= self.rotation_vel
+
+    def draw(self, screen):
+        blit_rotate_center(screen, self.img, (self.x, self.y), self.angle)
+
+    def move_forward(self):
+        self.vel = min(self.vel + self.acceleration, self.max_vel)
+        self.move()
+
+    def move(self):
+        self.x += self.vel
+
+class PlayerCar(AbstractCar):
+    IMG = mario_start
+    start_pos = (10, 305)
+
+def draw(screen, player_car):
+#     for img, pos in images:
+#         screen.blit(img, pos)
+    
+    player_car.draw(screen)
 def car(x, y):
     screen.blit(mario_start, (x, y))
 
@@ -102,6 +137,8 @@ def game_loop():
     # Run until the user asks to quit
     running = True
     clock = pygame.time.Clock()
+    keys = pygame.key.get_pressed()
+    player_car = PlayerCar(4, 4)
     while running:
         # Did the user click the window close button?
         for event in pygame.event.get():
@@ -121,6 +158,12 @@ def game_loop():
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     y_change = 0
                     x_change = 0
+
+            if keys[pygame.K_a]:
+                player_car.rotate(left=True)
+            if keys[pygame.K_d]:
+                player_car.rotate(right=True)
+
         y += y_change
         x += x_change
 

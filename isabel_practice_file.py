@@ -100,8 +100,7 @@ while running:
          player_car.rotate(left=True)
      if keys[pygame.K_d]:
          player_car.rotate(right=True)
-     if keys[pygame.K_w]:
-         player_car.move_forward()
+
          
 
 # Done! Time to quit.
