@@ -3,7 +3,7 @@ import pygame
 from pygame.locals import *
 import time
 import random
-from utils import scale_image, blit_rotate_center
+from utils import blit_rotate_center
 
 pygame.init()
 pygame.font.init()
@@ -64,8 +64,8 @@ def draw(screen, player_car):
 #         screen.blit(img, pos)
     
     player_car.draw(screen)
-def car(x, y):
-    screen.blit(mario_start, (x, y))
+def car(PlayerCar, x, y):
+    screen.blit(PlayerCar.IMG, (x, y))
 
 def text_objects(txt, font):
     '''Object for text class given inputted string and font'''
@@ -147,28 +147,34 @@ def game_loop():
         
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    y_change = -5
+                    y_change = -3
                 if event.key == pygame.K_DOWN:
-                    y_change = 5
+                    y_change = 3
                 if event.key == pygame.K_LEFT:
-                    x_change = -5
+                    x_change = -3
                 if event.key == pygame.K_RIGHT:
-                    x_change = 5
+                    x_change = 3
+                if event.key == pygame.K_a:
+                    player_car.rotate(left = True)
+                if event.key == pygame.K_d:
+                   player_car.rotate(right = True)
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d:
                     y_change = 0
                     x_change = 0
 
-            if keys[pygame.K_a]:
-                player_car.rotate(left=True)
-            if keys[pygame.K_d]:
-                player_car.rotate(right=True)
+            # if keys[pygame.K_a]:
+            #     player_car.rotate(left=True)
+            # if keys[pygame.K_d]:
+            # #if pygame.key.get_pressed() == [pygame.K_d]:
+            #     player_car.rotate(right=True)
 
         y += y_change
         x += x_change
 
         screen.blit(bg_image, (0, 0))
-        car(x, y)
+        car(player_car, x, y)
+        #player_car
 
         pygame.display.update()
         clock.tick(FPS) 
