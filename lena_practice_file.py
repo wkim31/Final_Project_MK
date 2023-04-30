@@ -4,6 +4,7 @@ from pygame.locals import *
 import time
 import random
 from utils import blit_rotate_center
+from dataclasses import dataclass
 
 pygame.init()
 pygame.font.init()
@@ -16,6 +17,7 @@ pygame.display.set_caption("Race Karting Game!")
 bg_image = pygame.image.load('images/fin_track-mariocircuit-3.png')
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 mario_start = pygame.image.load('Mario-backside.png')
+banana = pygame.image.load('images/banana.png')
 # track border
 # finish line
 orange_car = pygame.image.load("images/orange-car.png") 
@@ -28,7 +30,26 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 cadet_blue = (142, 229, 238)
 cyan = (0, 238, 238)
+green = (69, 139, 0)
+bright_green = (127, 255, 0)
+orange = (255, 153, 18)
+bright_orange = (255, 97, 3)
 # title
+pause = False
+
+@dataclass
+class Gadget:
+    descr: pygame.image
+    x: int
+    y: int
+class Gadgets:
+    #eg gadgets([("banana", 22, 42), ("coffee", 32, 89)])
+    items: list
+
+banana_list = [Gadget(banana, 80, 700)]
+#def draw_gad()
+
+
 
 def car(bg, img1, x, y, angle):
     blit_rotate_center(bg, img1, (x, y), angle)
@@ -49,8 +70,7 @@ def message_display(txt):
     time.sleep(2)
     game_loop()
 
-def crash():
-    message_display('You Crashed')
+
 
 def button(msg, x, y, w, h, ic, ac, action = None):
     '''button-pressed function. message, x coord, y coord, width, heigh, initial color, 
@@ -90,18 +110,47 @@ def game_intro():
         pygame.display.update()
         clock.tick(15)
 
+def quitgame():
+    '''helper for pause'''
+    pygame.quit()
+    quit()
+
+def unpause():
+    '''helper for pause'''
+    global pause
+    pause = False
+
+def paused():
+
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        largeTxt = pygame.font.SysFont('georgia', 100)
+        ts, tr = text_objects("Paused", largeTxt)
+        tr.center = ((WIDTH/2), (HEIGHT/4))
+        screen.blit(ts, tr)
+        button("Continue", 150, 450, 100, 50, green, bright_green, unpause)
+        button("Quit", 700, 450, 100, 50, orange, bright_orange, quitgame)
+        pygame.display.update()
+        clock.tick(15)
+
+
 
 def game_loop():
     FPS = 60
     #variables for car:
     x = (80)
     y = (400)
-    angle = 90
+    angle = 0
     bg = screen
     img1 = mario_start
     x_change = 0
     y_change = 0
     angle_change = 0
+    global pause
 
     # Run until the user asks to quit
     running = True
@@ -115,19 +164,22 @@ def game_loop():
         
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    y_change = -3
+                    y_change = -2
                 if event.key == pygame.K_DOWN:
-                    y_change = 3
+                    y_change = 2
                 if event.key == pygame.K_LEFT:
-                    x_change = -3
+                    x_change = -2
                 if event.key == pygame.K_RIGHT:
-                    x_change = 3
+                    x_change = 2
                 if event.key == pygame.K_a:
-                    angle_change = 5
+                    angle_change = 2
                 if event.key == pygame.K_d:
-                   angle_change = -5
+                   angle_change = -2
+                if event.key == pygame.K_p:
+                    pause = True
+                    paused()
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d:
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_p:
                     y_change = 0
                     x_change = 0
                     angle_change = 0
