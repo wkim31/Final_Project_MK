@@ -18,6 +18,7 @@ bg_image = pygame.image.load('images/fin_track-mariocircuit-3.png')
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 mario_start = pygame.image.load('Mario-backside.png')
 banana = pygame.image.load('images/banana.png')
+star = pygame.image.load('images/star.png')
 # track border
 # finish line
 orange_car = pygame.image.load("images/orange-car.png") 
@@ -37,19 +38,26 @@ bright_orange = (255, 97, 3)
 # title
 pause = False
 
-@dataclass
 class Gadget:
-    descr: pygame.image
-    x: int
-    y: int
-class Gadgets:
-    #eg gadgets([("banana", 22, 42), ("coffee", 32, 89)])
-    items: list
+    def __init__(self, img, x, y):
+        self.img = img
+        self.x = x
+        self.y = y
+    def display(self):
+        screen.blit(self.img, (self.x, self.y))
 
-banana_list = [Gadget(banana, 80, 700)]
-#def draw_gad()
+# class Char:
+#     def __init__(self, img, x, y):
+#         self.img = img
+#         self.x = x
+#         self.y = y
+#     def display(self):
+#         screen.blit(self.img, (self.x, self.y))
 
+banana_list = [Gadget(banana,  80, 100), Gadget(banana, 900, 100), Gadget(banana, 60, 750)]
+star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800)]
 
+#mario = Char(mario_start, 80, 400)
 
 def car(bg, img1, x, y, angle):
     blit_rotate_center(bg, img1, (x, y), angle)
@@ -150,6 +158,8 @@ def game_loop():
     x_change = 0
     y_change = 0
     angle_change = 0
+    SPEED = 2
+    gad = banana_list
     global pause
 
     # Run until the user asks to quit
@@ -161,16 +171,16 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    y_change = -2
+                    y_change = -SPEED
                 if event.key == pygame.K_DOWN:
-                    y_change = 2
+                    y_change = SPEED
                 if event.key == pygame.K_LEFT:
-                    x_change = -2
+                    x_change = -SPEED
                 if event.key == pygame.K_RIGHT:
-                    x_change = 2
+                    x_change = SPEED
                 if event.key == pygame.K_a:
                     angle_change = 2
                 if event.key == pygame.K_d:
@@ -178,19 +188,37 @@ def game_loop():
                 if event.key == pygame.K_p:
                     pause = True
                     paused()
+
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_p:
+                all = event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_p
+                if all:
                     y_change = 0
                     x_change = 0
                     angle_change = 0
 
 
-        y += y_change
-        x += x_change
+        if x > 1000:
+            x = 1000
+        elif x < 0:
+            x = 0
+        else: 
+            x+= x_change
+        if y > 1000:
+            y = 1000
+        elif y < 0:
+            y = 0
+        else:
+            y += y_change
+        #x += x_change
         angle += angle_change
 
         screen.blit(bg_image, (0, 0))
         car(bg, img1, x, y, angle)
+        for item in banana_list:
+                item.display()
+        for item in star_list:
+            item.display()
+        
         #player_car
 
         pygame.display.update()
