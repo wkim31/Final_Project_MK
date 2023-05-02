@@ -6,6 +6,7 @@ import random
 from utils import blit_rotate_center
 from dataclasses import dataclass
 
+# black screen at end- how to fix?
 pygame.init()
 pygame.font.init()
 #Define game state:
@@ -36,7 +37,9 @@ bright_green = (127, 255, 0)
 orange = (255, 153, 18)
 bright_orange = (255, 97, 3)
 # title
+#Globals:
 pause = False
+out = False
 
 class Gadget:
     def __init__(self, img, x, y):
@@ -55,7 +58,7 @@ class Gadget:
 #         screen.blit(self.img, (self.x, self.y))
 
 banana_list = [Gadget(banana,  80, 100), Gadget(banana, 900, 100), Gadget(banana, 60, 750)]
-star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800)]
+star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800), Gadget(star, 200, 850)]
 
 #mario = Char(mario_start, 80, 400)
 
@@ -123,6 +126,26 @@ def quitgame():
     pygame.quit()
     quit()
 
+def finish_line():
+    '''start screen'''
+    out = True
+
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        largeText = pygame.font.SysFont('georgia', 80)
+        txtsurf, txtrect = text_objects('finished!', largeText)
+        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
+        screen.blit(txtsurf, txtrect)
+        button("Next Level", 150, 450, 100, 50, cadet_blue, cyan, game_loop)
+        button("Quit", 700, 450, 100, 50, cadet_blue, cyan, quitgame)
+
+        pygame.display.update()
+        clock.tick(15)
+
 def unpause():
     '''helper for pause'''
     global pause
@@ -158,9 +181,10 @@ def game_loop():
     x_change = 0
     y_change = 0
     angle_change = 0
-    SPEED = 2
-    gad = banana_list
+    SPEED = 5
+    banana_speed = 1
     global pause
+    global out
 
     # Run until the user asks to quit
     running = True
@@ -171,6 +195,11 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            
+            for item in banana_list:
+                if ((item.x + 30) >= x >= (item.x)) and ((item.y + 30) >= y >= (item.y)):
+                    SPEED == banana_speed
+                    banana_list.pop(item)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -196,21 +225,28 @@ def game_loop():
                     x_change = 0
                     angle_change = 0
 
-
-        if x > 1000:
-            x = 1000
+        #boundaries:
+        if x > WIDTH - 5:
+            x = 995
         elif x < 0:
             x = 0
         else: 
             x+= x_change
-        if y > 1000:
-            y = 1000
+
+        if y > HEIGHT:
+            y = HEIGHT
         elif y < 0:
             y = 0
         else:
             y += y_change
-        #x += x_change
+
         angle += angle_change
+
+        ######)
+        if (y == 410) and (85 > x > 20):
+            out = True
+            finish_line()
+ 
 
         screen.blit(bg_image, (0, 0))
         car(bg, img1, x, y, angle)
