@@ -6,7 +6,6 @@ import random
 from utils import blit_rotate_center
 from dataclasses import dataclass
 
-# black screen at end- how to fix?
 pygame.init()
 pygame.font.init()
 #Define game state:
@@ -40,14 +39,16 @@ bright_orange = (255, 97, 3)
 #Globals:
 pause = False
 out = False
-
+angle_change = 0
+spin = False
 class Gadget:
     def __init__(self, img, x, y):
         self.img = img
         self.x = x
-        self.y = y
+        self.y = y  
     def display(self):
         screen.blit(self.img, (self.x, self.y))
+
 
 # class Char:
 #     def __init__(self, img, x, y):
@@ -127,7 +128,7 @@ def quitgame():
     quit()
 
 def finish_line():
-    '''start screen'''
+    '''finish line screen. Choice: go on to next level, or quit game'''
     out = True
 
     while out:
@@ -169,7 +170,6 @@ def paused():
         clock.tick(15)
 
 
-
 def game_loop():
     FPS = 60
     #variables for car:
@@ -180,11 +180,13 @@ def game_loop():
     img1 = mario_start
     x_change = 0
     y_change = 0
-    angle_change = 0
+    global angle_change
     SPEED = 5
     banana_speed = 1
+    star_speed = 7
     global pause
     global out
+    
 
     # Run until the user asks to quit
     running = True
@@ -195,13 +197,18 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
-            for item in banana_list:
-                if ((item.x + 30) >= x >= (item.x)) and ((item.y + 30) >= y >= (item.y)):
-                    SPEED == banana_speed
-                    banana_list.pop(item)
 
             if event.type == pygame.KEYDOWN:
+                for item in banana_list:
+                    if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
+                        SPEED = banana_speed
+                        banana_list.remove(item)
+
+                for item in star_list:
+                    if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
+                        SPEED = star_speed
+                        star_list.remove(item)
+
                 if event.key == pygame.K_UP:
                     y_change = -SPEED
                 if event.key == pygame.K_DOWN:
@@ -246,12 +253,11 @@ def game_loop():
         if (y == 410) and (85 > x > 20):
             out = True
             finish_line()
- 
-
+        ######
         screen.blit(bg_image, (0, 0))
         car(bg, img1, x, y, angle)
         for item in banana_list:
-                item.display()
+            item.display()
         for item in star_list:
             item.display()
         
