@@ -13,10 +13,10 @@ bg_image = pygame.image.load("images/fin_track-mariocircuit-3.png")
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
 border = pygame.transform.scale(border, (WIDTH, HEIGHT))
-# finish line
+border_mask = pygame.mask.from_surface(border)
+
 mario_start = pygame.image.load('Mario-backside.png')
 #mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
-#green_car = scale_image(pygame.image.load("green-car.png"), 0.169)
 
 # title
 pygame.display.set_caption("Race Karting Game!")
@@ -46,10 +46,14 @@ class AbstractCar:
         self.vel = min(self.vel + self.acceleration, self.max_vel)
         self.move()
 
+    def move_backward(self):
+        self.vel = max(self.vel - self.acceleration, -self.max_vel/2)
+        self.move()
+
     def move(self):
         radians = math.radians(self.angle)
         vertical = math.cos(radians) * self.vel
-        horizontal = math.sin(radians)* self.vel
+        horizontal = math.sin(radians) * self.vel
 
         self.y -= vertical
         self.x -= horizontal
@@ -58,6 +62,11 @@ class AbstractCar:
         self.vel = max(self.vel - self.acceleration / 2, 0)
         self.move()
 
+    def collide(self, mask, x=0, y=0):
+        car_mask = pygame.mask.from_surface(self.img)
+        offset = (int(self.x - x), int(self.y - y)) #we are subtracting the current car x and y positions from the positions of the other track border mask to give the displacement between the two masks; 
+        poi = mask.overlap(car_mask, offset) #this returns the point of intersection between the two masks (the border mask and the car mask) if there is a collision/overlap
+        return poi
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
@@ -69,17 +78,6 @@ def draw(screen, player_car):
     
     player_car.draw(screen)
     pygame.display.update()
-
-# class PlayerCar2(AbstractCar):
-#     IMG = green_car
-#     start_pos = (25, 305)
-
-# def draw(screen, player_car2):
-#     for img, pos in images:
-#         screen.blit(img, pos)
-    
-    # player_car2.draw(screen)
-    # pygame.display.update()
 
 # Run until the user asks to quit
 running = True
@@ -93,7 +91,6 @@ while running:
    # updates the drawing window
     screen.blit(bg_image, (0, 0))
     screen.blit(border, (0,0))
-    # screen.blit(mario_start,(0,0))
     # finish line
 
     #pygame.display.update()
@@ -106,22 +103,27 @@ while running:
      
      #change the angle by pressing a key
     keys = pygame.key.get_pressed()
-    move = False
+    moved = False
 
     if keys[pygame.K_a]:
         player_car.rotate(left=True)
     if keys[pygame.K_d]:
         player_car.rotate(right=True)
     if keys[pygame.K_UP]:
-        move=True
+        moved=True
         player_car.move_forward()
-    # if keys[pygame.K_RIGHT]:
-    #     player_car.move_right()
+    if keys[pygame.K_DOWN]:
+        moved=True
+        player_car.move_backward()
     # if keys[pygame.K_LEFT]:
     #     player_car.move_left()
 
-    if not move:
+    if not moved:
         player_car.reduce_speed()
+
+    if player_car.collide(border_mask) != None:
+        print("collide")
+
 
          
 # Done! Time to quit.
