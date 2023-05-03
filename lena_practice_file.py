@@ -17,6 +17,7 @@ pygame.display.set_caption("Race Karting Game!")
 bg_image = pygame.image.load('images/fin_track-mariocircuit-3.png')
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 mario_start = pygame.image.load('Mario-backside.png')
+luigi = pygame.image.load('images/luigi-2 (1).png')
 banana = pygame.image.load('images/banana.png')
 star = pygame.image.load('images/star.png')
 # track border
@@ -48,18 +49,6 @@ class Gadget:
         self.y = y  
     def display(self):
         screen.blit(self.img, (self.x, self.y))
-
-
-# class Char:
-#     def __init__(self, img, x, y):
-#         self.img = img
-#         self.x = x
-#         self.y = y
-#     def display(self):
-#         screen.blit(self.img, (self.x, self.y))
-
-banana_list = [Gadget(banana,  80, 100), Gadget(banana, 900, 100), Gadget(banana, 60, 750)]
-star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800), Gadget(star, 200, 850)]
 
 #mario = Char(mario_start, 80, 400)
 
@@ -129,7 +118,7 @@ def quitgame():
 
 def finish_line():
     '''finish line screen. Choice: go on to next level, or quit game'''
-    out = True
+    #out = True
 
     while out:
         for event in pygame.event.get():
@@ -175,14 +164,21 @@ def game_loop():
     #variables for car:
     x = (80)
     y = (400)
+    x2 = (35)
+    y2 = (305)
     angle = 0
     bg = screen
     img1 = mario_start
+    img2 = luigi
     x_change = 0
     y_change = 0
+    x2_change = 3
+    y2_change = 3
+    banana_list = [Gadget(banana,  80, 100), Gadget(banana, 900, 100), Gadget(banana, 60, 750)]
+    star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800), Gadget(star, 200, 850)]
     global angle_change
     SPEED = 5
-    banana_speed = 1
+    banana_speed = 2
     star_speed = 7
     global pause
     global out
@@ -201,8 +197,11 @@ def game_loop():
             if event.type == pygame.KEYDOWN:
                 for item in banana_list:
                     if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
+                        time_now = pygame.time.get_ticks()
                         SPEED = banana_speed
                         banana_list.remove(item)
+                        if pygame.time.get_ticks() >= time_now + 3000:
+                            SPEED = SPEED
 
                 for item in star_list:
                     if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
@@ -250,22 +249,27 @@ def game_loop():
         angle += angle_change
 
         ######)
-        if (y == 410) and (85 > x > 20):
+        if (405 < y < 412) and (85 > x > 20):
+            #diff of 7 acounts for max speed.
             out = True
             finish_line()
         ######
         screen.blit(bg_image, (0, 0))
+        #luigi:
+        car(bg, img2, x2, y2, angle)
+
+        #mario:
         car(bg, img1, x, y, angle)
         for item in banana_list:
             item.display()
         for item in star_list:
             item.display()
         
-        #player_car
 
         pygame.display.update()
         clock.tick(FPS) 
     # Done! Time to quit.
+
 game_intro()
 
 game_loop()
