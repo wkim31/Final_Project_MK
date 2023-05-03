@@ -72,6 +72,10 @@ class PlayerCar(AbstractCar):
     IMG = mario_start
     start_pos = (10, 305)
 
+    def bounce(self):
+     self.vel = -self.vel
+     self.move()
+
 def draw(screen, player_car):
 #     for img, pos in images:
 #         screen.blit(img, pos)
@@ -122,7 +126,7 @@ while running:
         player_car.reduce_speed()
 
     if player_car.collide(border_mask) != None:
-        print("collide")
+        player_car.bounce()
 
 
          
