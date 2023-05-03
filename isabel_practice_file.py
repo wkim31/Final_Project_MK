@@ -16,6 +16,7 @@ border = pygame.transform.scale(border, (WIDTH, HEIGHT))
 border_mask = pygame.mask.from_surface(border)
 
 mario_start = pygame.image.load('Mario-backside.png')
+luigi = pygame.image.load('images/luigi-2 (1).png')
 #mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
 
 # title
@@ -70,27 +71,47 @@ class AbstractCar:
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
-    start_pos = (10, 305)
+    start_pos = (20, 305)
 
     def bounce(self):
      self.vel = -self.vel
      self.move()
 
-def draw(screen, player_car):
+class ComputerCar(AbstractCar):
+    IMG = luigi
+    start_pos = (48,208)
+
+    def __init__(self, max_vel, rotation_vel, path=[]):
+        super().__init__(max_vel, rotation_vel)
+        self.path = path
+        self.current_point = 0
+        self.vel = max_vel
+
+    def draw_points(self, screen):
+        for point in self.path:
+            pygame.draw.circle(screen, (255, 0, 0), point, 5)
+
+    def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
+        super().draw(screen)
+        self.draw_points(screen)
+
+def draw(screen, player_car, computer_car):
 #     for img, pos in images:
 #         screen.blit(img, pos)
     
     player_car.draw(screen)
+    computer_car.draw(screen)
     pygame.display.update()
 
 # Run until the user asks to quit
 running = True
 images = [bg_image, (0,0)]
 player_car = PlayerCar(100,2)
+computer_car = ComputerCar(4,4)
 clock = pygame.time.Clock()
 while running:
    # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
-    draw(screen, player_car)
+    draw(screen, player_car, computer_car)
 
    # updates the drawing window
     screen.blit(bg_image, (0, 0))
@@ -104,6 +125,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             break
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+            computer_car.path.append(pos) #adds that position to the computer car's path
      
      #change the angle by pressing a key
     keys = pygame.key.get_pressed()
@@ -129,6 +154,6 @@ while running:
         player_car.bounce()
 
 
-         
+print(computer_car.path)
 # Done! Time to quit.
 pygame.quit() 
