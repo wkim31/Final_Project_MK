@@ -98,7 +98,7 @@ class ComputerCar(AbstractCar):
 def draw(screen, player_car, computer_car):
 #     for img, pos in images:
 #         screen.blit(img, pos)
-    
+    #
     player_car.draw(screen)
     computer_car.draw(screen)
     pygame.display.update()
