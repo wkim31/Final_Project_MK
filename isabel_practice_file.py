@@ -8,12 +8,14 @@ from utils import scale_image, blit_rotate_center
 WIDTH = 700
 HEIGHT = 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-bg_image = pygame.image.load("fin_track-mariocircuit-3.png")
+bg_image = pygame.image.load("images/fin_track-mariocircuit-3.png")
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
-border = pygame.image.load("fin_trackborder-mariocircuit-3.png")
+border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
 border = pygame.transform.scale(border, (WIDTH, HEIGHT))
+mario_start = pygame.image.load('Mario-backside.png')
+
 # finish line
-orange_car = scale_image(pygame.image.load("orange-car.png"), 0.05) 
+#orange_car = scale_image(pygame.image.load("orange-car.png"), 0.05) 
 #green_car = scale_image(pygame.image.load("green-car.png"), 0.169)
 
 # title
@@ -48,7 +50,7 @@ class AbstractCar:
         self.x += self.vel
 
 class PlayerCar(AbstractCar):
-    IMG = orange_car
+    IMG = mario_start
     start_pos = (10, 305)
 
 def draw(screen, player_car):
