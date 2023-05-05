@@ -13,14 +13,17 @@ bg_image = pygame.image.load("images/fin_track-mariocircuit-3.png")
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
 border = pygame.transform.scale(border, (WIDTH, HEIGHT))
-# finish line
-orange_car = scale_image(pygame.image.load("orange-car.png"), 0.05) 
-#green_car = scale_image(pygame.image.load("green-car.png"), 0.169)
+border_mask = pygame.mask.from_surface(border)
+
+mario_start = pygame.image.load('Mario-backside.png')
+luigi = pygame.image.load('images/luigi-2 (1).png')
+#mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
 
 # title
 pygame.display.set_caption("Race Karting Game!")
 ###
 #FPS = 60
+path = [(60, 104), (133, 49), (211, 75), (283, 205), (433, 204), (490, 65), (555, 46), (627, 67), (665, 138), (659, 234), (636, 273), (249, 372), (238, 415), (262, 443), (621, 447), (664, 498), (659, 585), (593, 624), (455, 631), (439, 559), (329, 554), (211, 645), (140, 658), (86, 629), (62, 550), (61, 288)]
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
@@ -68,8 +71,66 @@ class AbstractCar:
         return poi
 
 class PlayerCar(AbstractCar):
-    IMG = orange_car
-    start_pos = (10, 305)
+    IMG = mario_start
+    start_pos = (20, 305)
+
+    def bounce(self):
+     self.vel = -self.vel
+     self.move()
+
+class ComputerCar(AbstractCar):
+    IMG = luigi
+    start_pos = (48,208)
+
+    def __init__(self, max_vel, rotation_vel, path=[]):
+        super().__init__(max_vel, rotation_vel)
+        self.path = path
+        self.current_point = 0
+        self.vel = max_vel
+
+    def draw_points(self, screen):
+        for point in self.path:
+            pygame.draw.circle(screen, (255, 0, 0), point, 5)
+
+    def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
+        super().draw(screen)
+        self.draw_points(screen)
+
+    def calculate_angle(self):
+        target_x, target_y = self.path[self.current_point]
+        x_diff = target_x - self.x
+        y_diff = target_y - self.y
+
+        if y_diff == 0: #to avoid having a division by 0
+            desired_radian_angle = math.pi/2 #90 degrees
+        else:
+            desired_radian_angle = math.atan(x_diff/y_diff)
+
+        if target_y > self.y:
+            desired_radian_angle += math.pi
+
+        difference_in_angle = self.angle - math.degrees(desired_radian_angle)
+        if difference_in_angle >= 180:
+            difference_in_angle -= 360 #turns in the oppo direction
+
+        if difference_in_angle > 0:
+            self.angle -= min(self.rotation_vel, abs(difference_in_angle))
+        else:
+            self.angle += min(self.rotation_vel, abs(difference_in_angle))
+
+    def update_path_point(self):
+        target = self.path(self.current_point)
+        rect = pygame.Rect(self.x, self.y, self.img.get_width(), self.img.get_height())
+        if rect.collidepoint(*target):
+            self.current_point += 1
+
+    def move(self): #ensures no index error if trying to move a point that doesn't exist
+        if self.current_point >= len(self.path):
+            return
+        
+        self.calculate_angle()
+        self.update_path_point()
+        super().move()
 
 def draw(screen, player_car, computer_car):
 #     for img, pos in images:
@@ -83,7 +144,7 @@ def draw(screen, player_car, computer_car):
 running = True
 images = [bg_image, (0,0)]
 player_car = PlayerCar(100,2)
-computer_car = ComputerCar(4,4)
+computer_car = ComputerCar(4,4,path)
 clock = pygame.time.Clock()
 while running:
    # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
@@ -101,6 +162,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             break
+     
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
@@ -120,8 +182,7 @@ while running:
     if keys[pygame.K_DOWN]:
         moved=True
         player_car.move_backward()
-    # if keys[pygame.K_LEFT]:
-    #     player_car.move_left()
+
 
     if not moved:
         player_car.reduce_speed()
