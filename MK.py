@@ -19,7 +19,7 @@ mario_start = pygame.image.load('Mario-backside.png')
 luigi = pygame.image.load('images/luigi-2 (1).png')
 #mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
 
-# title
+# title#
 # pygame.display.set_caption("Race Karting Game!")
 ###
 #FPS = 60
