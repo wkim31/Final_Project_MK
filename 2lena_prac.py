@@ -21,6 +21,7 @@ mario_start = pygame.image.load('Mario-backside.png')
 luigi = pygame.image.load('images/luigi-2 (1).png')
 banana = pygame.image.load('images/banana.png')
 star = pygame.image.load('images/star.png')
+
 # track border
 # finish line
 orange_car = pygame.image.load("images/orange-car.png") 
