@@ -20,7 +20,7 @@ luigi = pygame.image.load('images/luigi-2 (1).png')
 #mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
 
 # title
-pygame.display.set_caption("Race Karting Game!")
+# pygame.display.set_caption("Race Karting Game!")
 ###
 #FPS = 60
 path = [(60, 104), (133, 49), (211, 75), (283, 205), (433, 204), (490, 65), (555, 46), (627, 67), (665, 138), (659, 234), (636, 273), (249, 372), (238, 415), (262, 443), (621, 447), (664, 498), (659, 585), (593, 624), (455, 631), (439, 559), (329, 554), (211, 645), (140, 658), (86, 629), (62, 550), (61, 288)]
