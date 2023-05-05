@@ -2,6 +2,7 @@
 import pygame
 from pygame.locals import *
 import math
+import time
 pygame.init()
 from utils import scale_image, blit_rotate_center
 
@@ -17,7 +18,125 @@ border_mask = pygame.mask.from_surface(border)
 
 mario_start = pygame.image.load('Mario-backside.png')
 luigi = pygame.image.load('images/luigi-2 (1).png')
+
+# colors:
+red = (255, 0, 0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+cadet_blue = (142, 229, 238)
+cyan = (0, 238, 238)
+green = (69, 139, 0)
+bright_green = (127, 255, 0)
+orange = (255, 153, 18)
+bright_orange = (255, 97, 3)
+#globals: 
+pause = False
+out = False
+clock = pygame.time.Clock()
+
 #mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
+
+#screens (start menus, end menus, pause menus)
+def text_objects(txt, font):
+    '''Object for text class given inputted string and font'''
+    txtsurface = font.render(txt, True, red)
+    return txtsurface, txtsurface.get_rect()
+
+def message_display(txt):
+    '''displays message according to fonts using text_objects'''
+    largeText = pygame.font.SysFont('georgia', 80)
+    txtsurf, txtrect =  text_objects(txt, largeText)
+    txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
+    screen.blit(txtsurf, txtrect)
+
+    pygame.display.update()
+    time.sleep(2)
+    game_loop()
+
+
+
+def button(msg, x, y, w, h, ic, ac, action = None):
+    '''button-pressed function. message, x coord, y coord, width, heigh, initial color, 
+    action color'''
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(screen, ac, (x, y, w, h))
+        if click[0] == 1 and action != None:
+            action()
+    else:
+        pygame.draw.rect(screen, ic, (x, y, w, h))
+    smallText = pygame.font.SysFont('georgia', 20)
+    textsurf, textrect = text_objects(msg, smallText)
+    textrect.center = ( (x + (w/2)), (y + (h/2) ))
+    screen.blit(textsurf, textrect)
+
+def game_intro():
+    '''start screen'''
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        largeText = pygame.font.SysFont('georgia', 80)
+        txtsurf, txtrect = text_objects('2D Mario Kart!', largeText)
+        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
+        screen.blit(txtsurf, txtrect)
+        
+
+        button("Go!", 450, 450, 100, 50, cadet_blue, cyan, game_loop)
+        pygame.display.update()
+        clock.tick(15)
+
+def quitgame():
+    '''helper for pause'''
+    pygame.quit()
+    quit()
+
+def finish_line():
+    '''finish line screen. Choice: go on to next level, or quit game'''
+    #out = True
+
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        largeText = pygame.font.SysFont('georgia', 80)
+        txtsurf, txtrect = text_objects('finished!', largeText)
+        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
+        screen.blit(txtsurf, txtrect)
+        button("Next Level", 150, 450, 100, 50, cadet_blue, cyan, game_loop)
+        button("Quit", 700, 450, 100, 50, cadet_blue, cyan, quitgame)
+
+        pygame.display.update()
+        clock.tick(15)
+
+def unpause():
+    '''helper for pause'''
+    global pause
+    pause = False
+
+def paused():
+
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        largeTxt = pygame.font.SysFont('georgia', 100)
+        ts, tr = text_objects("Paused", largeTxt)
+        tr.center = ((WIDTH/2), (HEIGHT/4))
+        screen.blit(ts, tr)
+        button("Continue", 150, 450, 100, 50, green, bright_green, unpause)
+        button("Quit", 700, 450, 100, 50, orange, bright_orange, quitgame)
+        pygame.display.update()
+        clock.tick(15)
 
 # title#
 # pygame.display.set_caption("Race Karting Game!")
@@ -141,56 +260,74 @@ def draw(screen, player_car, computer_car):
     pygame.display.update()
 
 # Run until the user asks to quit
-running = True
-images = [bg_image, (0,0)]
-player_car = PlayerCar(100,2)
-computer_car = ComputerCar(4,4,path)
-clock = pygame.time.Clock()
-while running:
-   # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
-    draw(screen, player_car, computer_car)
+def game_loop():
+    running = True
+    images = [bg_image, (0,0)]
+    player_car = PlayerCar(100,2)
+    computer_car = ComputerCar(4,4,path)
+    clock = pygame.time.Clock()
+    global out
+    global pause
+    while running:
+    # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
+        draw(screen, player_car, computer_car)
 
-   # updates the drawing window
-    screen.blit(bg_image, (0, 0))
-    screen.blit(border, (0,0))
-    # finish line
+    # updates the drawing window
+        screen.blit(bg_image, (0, 0))
+        screen.blit(border, (0,0))
+        # finish line
 
-    #pygame.display.update()
+        #pygame.display.update()
 
-     # Did the user click the window close button?
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-            break
-     
+        # Did the user click the window close button?
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                break
+        
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-            computer_car.path.append(pos) #adds that position to the computer car's path
-     
-     #change the angle by pressing a key
-    keys = pygame.key.get_pressed()
-    moved = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+                computer_car.path.append(pos) #adds that position to the computer car's path
+        
+        #change the angle by pressing a key
+        keys = pygame.key.get_pressed()
+        moved = False
 
-    if keys[pygame.K_a]:
-        player_car.rotate(left=True)
-    if keys[pygame.K_d]:
-        player_car.rotate(right=True)
-    if keys[pygame.K_UP]:
-        moved=True
-        player_car.move_forward()
-    if keys[pygame.K_DOWN]:
-        moved=True
-        player_car.move_backward()
+        if keys[pygame.K_a]:
+            player_car.rotate(left=True)
+        if keys[pygame.K_d]:
+            player_car.rotate(right=True)
+        if keys[pygame.K_UP]:
+            moved=True
+            player_car.move_forward()
+        if keys[pygame.K_DOWN]:
+            moved=True
+            player_car.move_backward()
+        if keys[pygame.K_p]:
+            pause = True
+            paused()
+
+        if (player_car.y == 288) and (85 > player_car.x > 20):
+            out = True
+            finish_line()
 
 
-    if not moved:
-        player_car.reduce_speed()
+        if not moved:
+            player_car.reduce_speed()
 
-    if player_car.collide(border_mask) != None:
-        player_car.bounce()
+        if player_car.collide(border_mask) != None:
+            player_car.bounce()
+
+        pygame.display.update()
+
+    print(computer_car.path)
+
+game_intro()
+
+#game_loop()
 
 
-print(computer_car.path)
 # Done! Time to quit.
 pygame.quit() 
+quit()

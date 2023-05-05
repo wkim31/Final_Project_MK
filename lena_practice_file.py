@@ -1,6 +1,6 @@
 #imports:
 import pygame
-from abstract_Car_code import *
+#from abstract_Car_code import *
 from pygame.locals import *
 import time
 import random
@@ -214,9 +214,9 @@ def game_loop():
     clock = pygame.time.Clock()
     #keys = pygame.key.get_pressed()
     time_now = 0
-    computer_car = ComputerCar(4, 4)
+    #computer_car = ComputerCar(4, 4)
     while running:
-        draw(WIN, images, player_car, computer_car)
+        #draw(WIN, images, player_car, computer_car)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
