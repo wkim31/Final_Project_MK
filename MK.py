@@ -319,7 +319,6 @@ def game_loop():
         if player_car.collide(border_mask) != None:
             player_car.bounce()
 
-        pygame.display.update()
 
     print(computer_car.path)
 
