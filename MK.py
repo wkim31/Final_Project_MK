@@ -15,14 +15,26 @@ bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
 border = pygame.transform.scale(border, (WIDTH, HEIGHT))
 border_mask = pygame.mask.from_surface(border)
-
+FINISH = pygame.image.load('images/track-finish.png')
+FINISH = pygame.transform.scale(FINISH, (WIDTH, HEIGHT))
+FINISH_MASK = pygame.mask.from_surface(FINISH)
 mario_start = pygame.image.load('Mario-backside.png')
 luigi = pygame.image.load('images/luigi-2 (1).png')
+title_screen = pygame.image.load('images/game icon.gif')
+title_screen = pygame.transform.scale(title_screen, (WIDTH, HEIGHT))
+pause_screen = pygame.image.load('images/Mario Kart instructions.png')
+finish = pygame.image.load('images/celebrate.jpeg')
+finish = pygame.transform.scale(finish, (WIDTH, HEIGHT))
+FINISH_POSITION = (61, 288)
+banana = pygame.image.load('images/banana.png')
+banana_mask = pygame.mask.from_surface(banana)
+star = pygame.image.load('images/star.png')
 
 # colors:
 red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
+dark_blue = (0, 0, 205)
 cadet_blue = (142, 229, 238)
 cyan = (0, 238, 238)
 green = (69, 139, 0)
@@ -39,7 +51,7 @@ clock = pygame.time.Clock()
 #screens (start menus, end menus, pause menus)
 def text_objects(txt, font):
     '''Object for text class given inputted string and font'''
-    txtsurface = font.render(txt, True, red)
+    txtsurface = font.render(txt, True, white)
     return txtsurface, txtsurface.get_rect()
 
 def message_display(txt):
@@ -80,14 +92,8 @@ def game_intro():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(black)
-        largeText = pygame.font.SysFont('georgia', 80)
-        txtsurf, txtrect = text_objects('2D Mario Kart!', largeText)
-        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
-        screen.blit(txtsurf, txtrect)
-        
-
-        button("Go!", 450, 450, 100, 50, cadet_blue, cyan, game_loop)
+        screen.blit(title_screen, (0, 0))
+        button("Go!", 300, 300, 130, 60, dark_blue, cyan, game_loop)
         pygame.display.update()
         clock.tick(15)
 
@@ -105,13 +111,9 @@ def finish_line():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(black)
-        largeText = pygame.font.SysFont('georgia', 80)
-        txtsurf, txtrect = text_objects('finished!', largeText)
-        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
-        screen.blit(txtsurf, txtrect)
-        button("Next Level", 150, 450, 100, 50, cadet_blue, cyan, game_loop)
-        button("Quit", 700, 450, 100, 50, cadet_blue, cyan, quitgame)
+        screen.blit(finish, (0, 0))
+        button("Next Level", 200, 570, 100, 50, cadet_blue, cyan, game_loop)
+        button("Quit", 400, 570, 100, 50, cadet_blue, cyan, quitgame)
 
         pygame.display.update()
         clock.tick(15)
@@ -128,15 +130,21 @@ def paused():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(black)
-        largeTxt = pygame.font.SysFont('georgia', 100)
-        ts, tr = text_objects("Paused", largeTxt)
-        tr.center = ((WIDTH/2), (HEIGHT/4))
-        screen.blit(ts, tr)
-        button("Continue", 150, 450, 100, 50, green, bright_green, unpause)
-        button("Quit", 700, 450, 100, 50, orange, bright_orange, quitgame)
+        screen.fill(white)
+        screen.blit(pause_screen, (0, 0))
+        button("Continue", 200, 630, 100, 50, green, bright_green, unpause)
+        button("Quit", 400, 630, 100, 50, orange, bright_orange, quitgame)
         pygame.display.update()
         clock.tick(15)
+
+class Gadget:
+    def __init__(self, img, x, y):
+        self.img = img
+        self.x = x
+        self.y = y  
+    def display(self):
+        screen.blit(self.img, (self.x, self.y))
+
 
 # title#
 # pygame.display.set_caption("Race Karting Game!")
@@ -259,15 +267,32 @@ def draw(screen, player_car, computer_car):
     computer_car.draw(screen)
     pygame.display.update()
 
+def handle_collision(player_car, computer_car):
+    computer_finish_poi_collide = computer_car.collide(
+        FINISH_MASK)
+    if computer_finish_poi_collide != None:
+        out = True
+        finish_line()
+
+    player_finish_poi_collide = player_car.collide(
+        FINISH_MASK)
+    if player_finish_poi_collide != None:
+        #if player_finish_poi_collide[1] == 0:
+          print("THIS FINISHED!!!!!")
+          out = True
+          finish_line()
+
 # Run until the user asks to quit
 def game_loop():
     running = True
     images = [bg_image, (0,0)]
-    player_car = PlayerCar(100,2)
+    player_car = PlayerCar(100, 1)
     computer_car = ComputerCar(4,4,path)
     clock = pygame.time.Clock()
     global out
     global pause
+    banana_list = [Gadget(banana, 133, 49), Gadget(banana, 400, 200), Gadget(banana, 635, 460)]
+    star_list = [Gadget(star, 460, 300), Gadget(star, 355, 550), Gadget(star, 215, 370)]
     while running:
     # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
         draw(screen, player_car, computer_car)
@@ -308,9 +333,14 @@ def game_loop():
             pause = True
             paused()
 
-        if (player_car.y == 288) and (85 > player_car.x > 20):
-            out = True
-            finish_line()
+        # for item in banana_list:
+        #     if player_car.collide(banana_mask) != None:
+        #         player_car.bounce()
+        #         banana_list.remove(item) 
+
+        # if (280 < player_car.y < 300) and (85 > player_car.x > 20):
+        #     out = True
+        #     finish_line()
 
 
         if not moved:
@@ -318,13 +348,20 @@ def game_loop():
 
         if player_car.collide(border_mask) != None:
             player_car.bounce()
+        
+        for item in banana_list:
+            item.display()
+        for item in star_list:
+            item.display()
+        
+        handle_collision(player_car, computer_car)
 
 
     print(computer_car.path)
 
 game_intro()
 
-#game_loop()
+game_loop()
 
 
 # Done! Time to quit.

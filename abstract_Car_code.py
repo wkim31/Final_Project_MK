@@ -209,21 +209,21 @@ images = [(SAND, (0, 0)), (bg_image, (0, 0)),
 player_car = PlayerCar(4, 4)
 computer_car = ComputerCar(4, 4, PATH)
 
-while run:
-    clock.tick(FPS)
+# while run:
+#     clock.tick(FPS)
 
-    draw(WIN, images, player_car, computer_car)
+#     draw(WIN, images, player_car, computer_car)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-            break
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             run = False
+#             break
 
-    move_player(player_car)
-    computer_car.move()
+#     move_player(player_car)
+#     computer_car.move()
 
-    handle_collision(player_car, computer_car)
-pygame.display.update()
-clock.tick(FPS) 
-print(computer_car.path)
-pygame.quit()
+#     handle_collision(player_car, computer_car)
+# pygame.display.update()
+# clock.tick(FPS) 
+# print(computer_car.path)
+# pygame.quit()
