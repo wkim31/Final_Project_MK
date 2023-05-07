@@ -25,10 +25,11 @@ title_screen = pygame.transform.scale(title_screen, (WIDTH, HEIGHT))
 pause_screen = pygame.image.load('images/Mario Kart instructions.png')
 finish = pygame.image.load('images/celebrate.jpeg')
 finish = pygame.transform.scale(finish, (WIDTH, HEIGHT))
-FINISH_POSITION = (61, 288)
+FINISH_POSITION = (3, 3)
 banana = pygame.image.load('images/banana.png')
 banana_mask = pygame.mask.from_surface(banana)
 star = pygame.image.load('images/star.png')
+star_mask = pygame.mask.from_surface(star)
 
 # colors:
 red = (255, 0, 0)
@@ -104,7 +105,7 @@ def quitgame():
 
 def finish_line():
     '''finish line screen. Choice: go on to next level, or quit game'''
-    #out = True
+    out = True
 
     while out:
         for event in pygame.event.get():
@@ -137,17 +138,16 @@ def paused():
         pygame.display.update()
         clock.tick(15)
 
-class Gadget:
-    def __init__(self, img, x, y):
-        self.img = img
-        self.x = x
-        self.y = y  
-    def display(self):
-        screen.blit(self.img, (self.x, self.y))
+# class Gadget:
+#     def __init__(self, img, x, y):
+#         self.img = img
+#         self.x = x
+#         self.y = y  
+#     def display(self):
+#         screen.blit(self.img, (self.x, self.y))
 
 
 # title#
-# pygame.display.set_caption("Race Karting Game!")
 ###
 #FPS = 60
 path = [(60, 104), (133, 49), (211, 75), (283, 205), (433, 204), (490, 65), (555, 46), (627, 67), (665, 138), (659, 234), (636, 273), (249, 372), (238, 415), (262, 443), (621, 447), (664, 498), (659, 585), (593, 624), (455, 631), (439, 559), (329, 554), (211, 645), (140, 658), (86, 629), (62, 550), (61, 288)]
@@ -167,7 +167,7 @@ class AbstractCar:
             self.angle += self.rotation_vel
         elif right:
             self.angle -= self.rotation_vel
-
+ 
     def draw(self, screen):
         blit_rotate_center(screen, self.img, (self.x, self.y), self.angle)
 
@@ -199,7 +199,7 @@ class AbstractCar:
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
-    start_pos = (20, 305)
+    start_pos = (20, 255)
 
     def bounce(self):
      self.vel = -self.vel
@@ -207,7 +207,7 @@ class PlayerCar(AbstractCar):
 
 class ComputerCar(AbstractCar):
     IMG = luigi
-    start_pos = (48,208)
+    start_pos = (48,158)
 
     def __init__(self, max_vel, rotation_vel, path=[]):
         super().__init__(max_vel, rotation_vel)
@@ -259,57 +259,72 @@ class ComputerCar(AbstractCar):
         self.update_path_point()
         super().move()
 
-def draw(screen, player_car, computer_car):
-#     for img, pos in images:
-#         screen.blit(img, pos)
-    #
+def draw(screen, images, img_banana, img_star, player_car, computer_car):
+    for img, pos in images:
+        screen.blit(img, pos)
+    for img, pos in img_banana:
+        screen.blit(img, pos)
+    for img, pos in img_star:
+        screen.blit(img, pos)
+    
     player_car.draw(screen)
     computer_car.draw(screen)
-    pygame.display.update()
+    #pygame.display.update()
 
-def handle_collision(player_car, computer_car):
+def handle_collision(player_car, computer_car, img_banana, img_star):
     computer_finish_poi_collide = computer_car.collide(
-        FINISH_MASK)
+        FINISH_MASK, *FINISH_POSITION)
     if computer_finish_poi_collide != None:
-        out = True
-        finish_line()
+       finish_line()
 
     player_finish_poi_collide = player_car.collide(
-        FINISH_MASK)
+        FINISH_MASK, *FINISH_POSITION)
     if player_finish_poi_collide != None:
-        #if player_finish_poi_collide[1] == 0:
-          print("THIS FINISHED!!!!!")
-          out = True
-          finish_line()
+        #print("THIS IS!!!!!!!!!!!!!" + str(player_finish_poi_collide))
+        if player_finish_poi_collide[1] == 284:
+            #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
+            player_car.bounce()
+        else:
+            finish_line()
+    for item, pos in img_banana:
+        banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
+        if banana_finish_poi_collide != None:
+            unwanted = (item, pos)
+            img_banana = [e for e in img_banana if (e != unwanted)]
+            print("THIS IS!!!!!!!" + str(img_banana))
+            player_car.rotate(left=True)            
+    for (item, pos) in img_star:
+        star_finish_poi_collide = player_car.collide(star_mask, *pos)
+        if star_finish_poi_collide != None:
+            img_star = [e for e in img_star if (e != (item, pos))]
+            #player_car.
+
 
 # Run until the user asks to quit
 def game_loop():
     running = True
-    images = [bg_image, (0,0)]
+    images = [(FINISH, FINISH_POSITION)]
+    img_banana = [(banana, (133, 49)), (banana, (400, 200)), (banana, (635, 460))]
+    img_star = [(star, (460, 300)), (star, (355, 550)), (star, (215, 370))]
     player_car = PlayerCar(100, 1)
     computer_car = ComputerCar(4,4,path)
     clock = pygame.time.Clock()
     global out
     global pause
-    banana_list = [Gadget(banana, 133, 49), Gadget(banana, 400, 200), Gadget(banana, 635, 460)]
-    star_list = [Gadget(star, 460, 300), Gadget(star, 355, 550), Gadget(star, 215, 370)]
     while running:
     # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
-        draw(screen, player_car, computer_car)
+        #draw(screen, images, img_banana, img_star, player_car, computer_car)
 
     # updates the drawing window
         screen.blit(bg_image, (0, 0))
         screen.blit(border, (0,0))
         # finish line
 
-        #pygame.display.update()
-
         # Did the user click the window close button?
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                break
-        
+                break        
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
@@ -333,15 +348,6 @@ def game_loop():
             pause = True
             paused()
 
-        # for item in banana_list:
-        #     if player_car.collide(banana_mask) != None:
-        #         player_car.bounce()
-        #         banana_list.remove(item) 
-
-        # if (280 < player_car.y < 300) and (85 > player_car.x > 20):
-        #     out = True
-        #     finish_line()
-
 
         if not moved:
             player_car.reduce_speed()
@@ -349,21 +355,15 @@ def game_loop():
         if player_car.collide(border_mask) != None:
             player_car.bounce()
         
-        for item in banana_list:
-            item.display()
-        for item in star_list:
-            item.display()
-        
-        handle_collision(player_car, computer_car)
+        handle_collision(player_car, computer_car, img_banana, img_star)
+        draw(screen, images, img_banana, img_star, player_car, computer_car)
 
+        pygame.display.update()
 
     print(computer_car.path)
 
 game_intro()
-
 game_loop()
-
-
 # Done! Time to quit.
 pygame.quit() 
 quit()
