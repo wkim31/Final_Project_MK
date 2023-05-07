@@ -24,7 +24,7 @@ luigi = pygame.image.load('images/luigi-new.png')
 # pygame.display.set_caption("Race Karting Game!")
 ###
 FPS = 60
-path = [(50, 109), (120, 35), (214, 59), (286, 192), (357, 209), (431, 194), (478, 61), (558, 34), (652, 81), (681, 157), (668, 253), (627, 287), (271, 379), (258, 412), (293, 438), (628, 440), (672, 491), (677, 568), (634, 626), (534, 647), (438, 624), (416, 571), (330, 562), (243, 641), (168, 669), (81, 650), (44, 531), (49, 290)]
+path = [(59, 143), (61, 89), (111, 45), (179, 42), (221, 73), (247, 124), (282, 186), (323, 214), (399, 214), (453, 187), (471, 120), (494, 60), (552, 41), (612, 53), (655, 102), (672, 163), (671, 218), (654, 271), (594, 294), (515, 314), (443, 330), (354, 350), (279, 367), (240, 400), (266, 439), (340, 443), (432, 442), (536, 440), (617, 443), (647, 471), (670, 523), (654, 590), (591, 620), (516, 632), (453, 624), (429, 586), (406, 550), (332, 554), (272, 600), (208, 652), (116, 664), (63, 606), (51, 523), (56, 288)]
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
@@ -61,10 +61,6 @@ class AbstractCar:
         self.y -= vertical
         self.x -= horizontal
 
-    def reduce_speed(self): #can move into PlayerCar class if u want
-        self.vel = max(self.vel - self.acceleration / 2, 0)
-        self.move()
-
     def collide(self, mask, x=0, y=0):
         car_mask = pygame.mask.from_surface(self.img)
         offset = (int(self.x - x), int(self.y - y)) #we are subtracting the current car x and y positions from the positions of the other track border mask to give the displacement between the two masks; 
@@ -75,13 +71,17 @@ class PlayerCar(AbstractCar):
     IMG = mario_start
     start_pos = (20, 305)
 
+    def reduce_speed(self): #can move into PlayerCar class if u want
+        self.vel = max(self.vel - self.acceleration / 2, 0)
+        self.move()
+
     def bounce(self):
      self.vel = -self.vel
      self.move()
 
 class ComputerCar(AbstractCar):
     IMG = luigi
-    start_pos = (-130,200)
+    start_pos = (50,300)
 
     def __init__(self, max_vel, rotation_vel, path=[]):
         super().__init__(max_vel, rotation_vel)
@@ -95,7 +95,7 @@ class ComputerCar(AbstractCar):
 
     def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
         super().draw(screen)
-        #self.draw_points(screen)
+        # self.draw_points(screen)
 
     def calculate_angle(self):
         target_x, target_y = self.path[self.current_point]
@@ -152,7 +152,7 @@ while running:
     draw(screen, player_car, computer_car)
 
    # updates the drawing window
-    screen.blit(bg_image, (0, 0))
+    screen.blit(bg_image, (0,0))
     screen.blit(border, (0,0))
     # finish line
 
