@@ -1,91 +1,59 @@
-#imports:
+#imports
 import pygame
-from abstract_Car_code import *
 from pygame.locals import *
+import math
 import time
-import random
-from utils import blit_rotate_center
-from dataclasses import dataclass
-
 pygame.init()
-pygame.font.init()
-#Define game state:
+from utils import scale_image, blit_rotate_center
+
 # Set up the drawing window
-WIDTH = 1000
-HEIGHT = 1000
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption("Race Karting Game!")
-bg_image = pygame.image.load('images/fin_track-mariocircuit-3.png')
+WIDTH = 700
+HEIGHT = 700
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+bg_image = pygame.image.load("images/fin_track-mariocircuit-3.png")
 bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
+border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
+border = pygame.transform.scale(border, (WIDTH, HEIGHT))
+border_mask = pygame.mask.from_surface(border)
+FINISH = pygame.image.load('images/track-finish.png')
+FINISH = pygame.transform.scale(FINISH, (WIDTH, HEIGHT))
+FINISH_MASK = pygame.mask.from_surface(FINISH)
 mario_start = pygame.image.load('Mario-backside.png')
 luigi = pygame.image.load('images/luigi-2 (1).png')
+title_screen = pygame.image.load('images/game icon.gif')
+title_screen = pygame.transform.scale(title_screen, (WIDTH, HEIGHT))
+pause_screen = pygame.image.load('images/Mario Kart instructions.png')
+finish = pygame.image.load('images/celebrate.jpeg')
+finish = pygame.transform.scale(finish, (WIDTH, HEIGHT))
+FINISH_POSITION = (3, 3)
 banana = pygame.image.load('images/banana.png')
+banana_mask = pygame.mask.from_surface(banana)
 star = pygame.image.load('images/star.png')
-
-# track border
-# finish line
-orange_car = pygame.image.load("images/orange-car.png") 
-
-#clock:
-clock = pygame.time.Clock()
-#colors:
+star_mask = pygame.mask.from_surface(star)
+ghost = pygame.image.load('images/ghost.png')
+ghost_mask = pygame.mask.from_surface(ghost)
+# colors:
 red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
+dark_blue = (0, 0, 205)
 cadet_blue = (142, 229, 238)
 cyan = (0, 238, 238)
 green = (69, 139, 0)
 bright_green = (127, 255, 0)
 orange = (255, 153, 18)
 bright_orange = (255, 97, 3)
-# title
-#Globals:
+#globals: 
 pause = False
 out = False
-angle_change = 0
-spin = False
-class Gadget:
-    def __init__(self, img, x, y):
-        self.img = img
-        self.x = x
-        self.y = y  
-    def display(self):
-        screen.blit(self.img, (self.x, self.y))
+clock = pygame.time.Clock()
 
-#mario = Char(mario_start, 80, 400)
-# class ComputerCar(AbstractCar): 
-#     IMG = luigi
-#     START_POS = (35, 305)
+#mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
 
-#     def __init__(self, max_vel , rotation_vel, path=[]):
-#         super().__init__(max, rotation_vel)
-#         self.path = path
-#         self.current_point = 0 
-#         self.vel = max_vel
-#     def draw_points(self, win):
-#         for point in self.path:
-#             pygame.draw.circle(win, (255, 0, 0), point, 5)
-    
-#     def draw(self, win):
-#         super().draw(win)
-#         #self.draw_points(win)
-    
-
-
-# def draw(win, images, player_car, computer_car):
-#     for img, pos in images:
-#         win.blit(img, pos)
-#     player_car.draw(win)
-#     computer_car.draw(win)
-#     pygame.display.update()
-
-
-def car(bg, img1, x, y, angle):
-    blit_rotate_center(bg, img1, (x, y), angle)
-
+#screens (start menus, end menus, pause menus)
 def text_objects(txt, font):
     '''Object for text class given inputted string and font'''
-    txtsurface = font.render(txt, True, red)
+    txtsurface = font.render(txt, True, white)
     return txtsurface, txtsurface.get_rect()
 
 def message_display(txt):
@@ -126,14 +94,8 @@ def game_intro():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(black)
-        largeText = pygame.font.SysFont('georgia', 80)
-        txtsurf, txtrect = text_objects('2D Mario Kart!', largeText)
-        txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
-        screen.blit(txtsurf, txtrect)
-        
-
-        button("Go!", 450, 450, 100, 50, cadet_blue, cyan, game_loop)
+        screen.blit(title_screen, (0, 0))
+        button("Go!", 300, 300, 130, 60, dark_blue, cyan, game_loop)
         pygame.display.update()
         clock.tick(15)
 
@@ -142,10 +104,25 @@ def quitgame():
     pygame.quit()
     quit()
 
-def finish_line():
+def finish_line_1():
     '''finish line screen. Choice: go on to next level, or quit game'''
-    #out = True
+    out = True
 
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.blit(finish, (0, 0))
+        button("1st Place!", 300, 170, 100, 50, bright_green, bright_green, None)
+        button("Next Level", 200, 570, 100, 50, cadet_blue, cyan, game_loop_2)
+        button("Quit", 400, 570, 100, 50, cadet_blue, cyan, quitgame)
+
+        pygame.display.update()
+        clock.tick(15)
+
+def com_victory():
+    out = True
     while out:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -153,14 +130,16 @@ def finish_line():
                 quit()
         screen.fill(black)
         largeText = pygame.font.SysFont('georgia', 80)
-        txtsurf, txtrect = text_objects('finished!', largeText)
+        txtsurf, txtrect = text_objects('You lose :(', largeText)
         txtrect.center = ((WIDTH/2), (HEIGHT/3.5))
         screen.blit(txtsurf, txtrect)
-        button("Next Level", 150, 450, 100, 50, cadet_blue, cyan, game_loop)
-        button("Quit", 700, 450, 100, 50, cadet_blue, cyan, quitgame)
+        
 
+        button("Try Again", 450, 450, 100, 50, cadet_blue, cyan, game_loop)
+        button("Quit Now", 150, 450, 100, 50, cadet_blue, cyan, quitgame)
         pygame.display.update()
         clock.tick(15)
+
 
 def unpause():
     '''helper for pause'''
@@ -174,136 +153,349 @@ def paused():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        screen.fill(black)
-        largeTxt = pygame.font.SysFont('georgia', 100)
-        ts, tr = text_objects("Paused", largeTxt)
-        tr.center = ((WIDTH/2), (HEIGHT/4))
-        screen.blit(ts, tr)
-        button("Continue", 150, 450, 100, 50, green, bright_green, unpause)
-        button("Quit", 700, 450, 100, 50, orange, bright_orange, quitgame)
+        screen.fill(white)
+        screen.blit(pause_screen, (0, 0))
+        button("Continue", 200, 630, 100, 50, green, bright_green, unpause)
+        button("Quit", 400, 630, 100, 50, orange, bright_orange, quitgame)
         pygame.display.update()
         clock.tick(15)
+# title#
+###
+#FPS = 60
+PATH = [(60, 104), (133, 49), (211, 75), (283, 205), (433, 204), (490, 65), (555, 46), (627, 67), (665, 138), (659, 234), (636, 273), (249, 372), (238, 415), (262, 443), (621, 447), (664, 498), (659, 585), (593, 624), (455, 631), (439, 559), (329, 554), (211, 645), (140, 658), (86, 629), (62, 550), (61, 288)]
+
+class AbstractCar:
+    def __init__(self, max_vel, rotation_vel):
+        self.img = self.IMG
+        self.max_vel = max_vel
+        self.vel = 0
+        self.rotation_vel = rotation_vel
+        self.angle = 0
+        self.x, self.y = self.start_pos
+        self.acceleration = 0.025
+
+    def rotate(self, left=False, right=False):
+        if left:
+            self.angle += self.rotation_vel
+        elif right:
+            self.angle -= self.rotation_vel
+ 
+    def draw(self, screen):
+        blit_rotate_center(screen, self.img, (self.x, self.y), self.angle)
+
+    def move_forward(self):
+        self.vel = min(self.vel + self.acceleration, self.max_vel)
+        self.move()
+
+    def move_backward(self):
+        self.vel = max(self.vel - self.acceleration, -self.max_vel/2)
+        self.move()
+
+    def move(self):
+        radians = math.radians(self.angle)
+        vertical = math.cos(radians) * self.vel
+        horizontal = math.sin(radians) * self.vel
+
+        self.y -= vertical
+        self.x -= horizontal
+
+    def reduce_speed(self):
+        self.vel = max(self.vel - self.acceleration / 2, 0)
+        self.move()
+
+    def collide(self, mask, x=0, y=0):
+        car_mask = pygame.mask.from_surface(self.img)
+        offset = (int(self.x - x), int(self.y - y)) #we are subtracting the current car x and y positions from the positions of the other track border mask to give the displacement between the two masks; 
+        poi = mask.overlap(car_mask, offset) #this returns the point of intersection between the two masks (the border mask and the car mask) if there is a collision/overlap
+        return poi
+    
+    def reset(self):
+        self.x, self.y = self.START_POS
+        self.angle = 0
+        self.vel = 0
+
+class PlayerCar(AbstractCar):
+    IMG = mario_start
+    start_pos = (20, 255)
+
+    def reduce_speed(self):
+        self.vel = max(self.vel - self.acceleration / 2, 0)
+        self.move()
+
+    def bounce(self):
+     self.vel = -self.vel
+     self.move()
+
+class ComputerCar(AbstractCar):
+    IMG = luigi
+    start_pos = (48,158)
+
+    def __init__(self, max_vel, rotation_vel, path=[]):
+        super().__init__(max_vel, rotation_vel)
+        self.path = path
+        self.current_point = 0
+        self.vel = max_vel
+
+    def draw_points(self, screen):
+        for point in self.path:
+            pygame.draw.circle(screen, (255, 0, 0), point, 5)
+
+    def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
+        super().draw(screen)
+        self.draw_points(screen)
+
+    def calculate_angle(self):
+        target_x, target_y = self.path[self.current_point]
+        x_diff = target_x - self.x
+        y_diff = target_y - self.y
+
+        if y_diff == 0: #to avoid having a division by 0
+            desired_radian_angle = math.pi/2 #90 degrees
+        else:
+            desired_radian_angle = math.atan(x_diff/y_diff)
+
+        if target_y > self.y:
+            desired_radian_angle += math.pi
+
+        difference_in_angle = self.angle - math.degrees(desired_radian_angle)
+        if difference_in_angle >= 180:
+            difference_in_angle -= 360 #turns in the oppo direction
+
+        if difference_in_angle > 0:
+            self.angle -= min(self.rotation_vel, abs(difference_in_angle))
+        else:
+            self.angle += min(self.rotation_vel, abs(difference_in_angle))
+
+    def update_path_point(self):
+        target = self.path[self.current_point]
+        rect = pygame.Rect(self.x, self.y, self.img.get_width(), self.img.get_height())
+        if rect.collidepoint(*target):
+            self.current_point += 1
+
+    def move(self): #ensures no index error if trying to move a point that doesn't exist
+        if self.current_point >= len(self.path):
+            return
+        
+        self.calculate_angle()
+        self.update_path_point()
+        super().move()
+
+def draw(screen, images, img_banana, player_car, computer_car):
+    for img, pos in images:
+        screen.blit(img, pos)
+    for img, pos in img_banana:
+        screen.blit(img, pos)
+
+    player_car.draw(screen)
+    computer_car.draw(screen)
+    #pygame.display.update()
+
+def move_player(player_car):
+    keys = pygame.key.get_pressed()
+    moved = False
+    global pause
+
+    if keys[pygame.K_a]:
+        player_car.rotate(left=True)
+    if keys[pygame.K_d]:
+        player_car.rotate(right=True)
+    if keys[pygame.K_UP]:
+        moved=True
+        player_car.move_forward()
+    if keys[pygame.K_DOWN]:
+        moved=True
+        player_car.move_backward()
+    if keys[pygame.K_p]:
+        pause = True
+        paused()
+
+    if not moved:
+        player_car.reduce_speed()
+
+    if player_car.collide(border_mask) != None:
+        player_car.bounce()
+
+def handle_collision(player_car, computer_car, img_banana):
+    computer_finish_poi_collide = computer_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+    if computer_finish_poi_collide != None:
+       com_victory()
+
+    player_finish_poi_collide = player_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+    if player_finish_poi_collide != None:
+        #print("THIS IS!!!!!!!!!!!!!" + str(player_finish_poi_collide))
+        if player_finish_poi_collide[1] == 284:
+            #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
+            player_car.bounce()
+        else:
+            finish_line_1()
+    for item, pos in img_banana:
+        banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
+        if banana_finish_poi_collide != None:
+            unwanted = (item, pos)
+            img_banana = [e for e in img_banana if (e != unwanted)]
+            print("THIS IS!!!!!!!" + str(img_banana))
+            player_car.rotate(left=True)            
+    # for (item, pos) in img_star:
+    #     star_finish_poi_collide = player_car.collide(star_mask, *pos)
+    #     if star_finish_poi_collide != None:
+    #         img_star = [e for e in img_star if (e != (item, pos))]
+    #         #player_car.
 
 
 def game_loop():
-    FPS = 60
-    #variables for car:
-    x = (80)
-    y = (400)
-    x2 = (35)
-    y2 = (305)
-    angle = 0
-    bg = screen
-    img1 = mario_start
-    img2 = luigi
-    x_change = 0
-    y_change = 0
-    x2_change = 3
-    y2_change = 3
-    banana_list = [Gadget(banana,  80, 100), Gadget(banana, 900, 100), Gadget(banana, 60, 750)]
-    star_list = [Gadget(star, 930, 300), Gadget(star, 500, 800), Gadget(star, 200, 850)]
-    global angle_change
-    SPEED = 5
-    banana_speed = 2
-    star_speed = 7
-    global pause
-    global out
-    
-
-    # Run until the user asks to quit
     running = True
+    images = [(FINISH, FINISH_POSITION)]
+    img_banana = [(banana, (133, 49)), (banana, (400, 200)), (banana, (635, 460)), (banana, (50, 500))]
+    #img_star = [(star, (460, 300)), (star, (355, 550)), (star, (215, 370))]
+    player_car = PlayerCar(100, 1)
+    computer_car = ComputerCar(4, 4, PATH)
     clock = pygame.time.Clock()
-    #keys = pygame.key.get_pressed()
-    time_now = 0
-    computer_car = ComputerCar(4, 4)
+    global out
+    global pause
     while running:
-        draw(WIN, images, player_car, computer_car)
+    # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
+        #draw(screen, images, img_banana, img_star, player_car, computer_car)
+
+    # updates the drawing window
+        screen.blit(bg_image, (0, 0))
+        screen.blit(border, (0,0))
+        # finish line
+
+        # Did the user click the window close button?
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                break        
 
-            if event.type == pygame.KEYDOWN:
-                for item in banana_list:
-                    if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
-                        time_now = pygame.time.get_ticks()
-                        SPEED = banana_speed
-                        banana_list.remove(item)
-                if pygame.time.get_ticks() >= time_now + 3000:
-                    SPEED = 5
-                    print("this is the speed,", SPEED)
-
-                for item in star_list:
-                    if ((item.x + 32) >= x >= (item.x)) and ((item.y + 32) >= y >= (item.y)) or ((item.x + 32) >= x + 32 >= (item.x)) and ((item.y + 32) >= y + 32 >= (item.y)):
-                        time_now = pygame.time.get_ticks()
-                        SPEED = star_speed
-                        star_list.remove(item)
-                if pygame.time.get_ticks() >= time_now + 3000:
-                    SPEED = 5
-
-                if event.key == pygame.K_UP:
-                    y_change = -SPEED
-                if event.key == pygame.K_DOWN:
-                    y_change = SPEED
-                if event.key == pygame.K_LEFT:
-                    x_change = -SPEED
-                if event.key == pygame.K_RIGHT:
-                    x_change = SPEED
-                if event.key == pygame.K_a:
-                    angle_change = 2
-                if event.key == pygame.K_d:
-                   angle_change = -2
-                if event.key == pygame.K_p:
-                    pause = True
-                    paused()
-
-            if event.type == pygame.KEYUP:
-                all = event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_p
-                if all:
-                    y_change = 0
-                    x_change = 0
-                    angle_change = 0
-
-        #boundaries:
-        if x > WIDTH - 5:
-            x = 995
-        elif x < 0:
-            x = 0
-        else: 
-            x+= x_change
-
-        if y > HEIGHT:
-            y = HEIGHT
-        elif y < 0:
-            y = 0
-        else:
-            y += y_change
-
-        angle += angle_change
-
-        ######)
-        if (405 < y < 412) and (85 > x > 20):
-            #diff of 7 acounts for max speed.
-            out = True
-            finish_line()
-        ######
-        screen.blit(bg_image, (0, 0))
-        #luigi:
-        car(bg, img2, x2, y2, angle)
-
-        #mario:
-        car(bg, img1, x, y, angle)
-        for item in banana_list:
-            item.display()
-        for item in star_list:
-            item.display()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+                computer_car.path.append(pos) #adds that position to the computer car's path
+    
+        move_player(player_car)
+        computer_car.move()
         
+        handle_collision(player_car, computer_car, img_banana)
+        draw(screen, images, img_banana, player_car, computer_car)
 
         pygame.display.update()
-        clock.tick(FPS) 
-    # Done! Time to quit.
+
+    print(computer_car.path)
+
+##Next level:
+def draw_2(screen, images, img_banana, img_star, img_ghost, player_car, computer_car):
+    for img, pos in images:
+        screen.blit(img, pos)
+    for img, pos in img_banana:
+        screen.blit(img, pos)
+    for img, pos in img_star:
+        screen.blit(img, pos)
+    for img, pos in img_ghost:
+        screen.blit(img, pos)
+
+    player_car.draw(screen)
+    computer_car.draw(screen)
+
+def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost):
+     computer_finish_poi_collide = computer_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+     if computer_finish_poi_collide != None:
+       com_victory()
+
+     player_finish_poi_collide = player_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+     if player_finish_poi_collide != None:
+        #print("THIS IS!!!!!!!!!!!!!" + str(player_finish_poi_collide))
+        if player_finish_poi_collide[1] == 284:
+            #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
+            player_car.bounce()
+        else:
+            finish_line_1()
+     for item, pos in img_banana:
+        banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
+        if banana_finish_poi_collide != None:
+            unwanted = (item, pos)
+            img_banana = [e for e in img_banana if (e != unwanted)]
+            print("THIS IS!!!!!!!" + str(img_banana))
+            player_car.rotate(left=True)            
+     for (item, pos) in img_star:
+        star_finish_poi_collide = player_car.collide(star_mask, *pos)
+        if star_finish_poi_collide != None:
+            img_star = [e for e in img_star if (e != (item, pos))]
+            #player_car.
+     for (item, pos) in img_ghost:
+        ghost_poi_collide = player_car.collide(ghost_mask, *pos)
+        if ghost_poi_collide != None:
+            img_ghost = [e for e in img_ghost if (e != (item, pos))]
+            player_car.reduce_speed()
+
+
+
+def game_loop_2():
+    #level 2
+    running = True
+    images = [(FINISH, FINISH_POSITION)]
+    img_banana = [(banana, (133, 49)), (banana, (400, 200)), (banana, (635, 460)), (banana, (50, 500))]
+    img_star = [(star, (460, 300)), (star, (355, 550)), (star, (215, 370))]
+    img_ghost = [(ghost, (50, 600)), (ghost, (418, 418)), (ghost, (350, 200))]
+    player_car = PlayerCar(100, 1)
+    computer_car = ComputerCar(4,4,PATH)
+    clock = pygame.time.Clock()
+    global out
+    global pause
+    while running:
+    # clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
+        #draw(screen, images, img_banana, img_star, player_car, computer_car)
+
+    # updates the drawing window
+        screen.blit(bg_image, (0, 0))
+        screen.blit(border, (0,0))
+        # finish line
+
+        # Did the user click the window close button?
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                break        
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+                computer_car.path.append(pos) #adds that position to the computer car's path
+        
+        #change the angle by pressing a key
+        keys = pygame.key.get_pressed()
+        moved = False
+
+        if keys[pygame.K_a]:
+            player_car.rotate(left=True)
+        if keys[pygame.K_d]:
+            player_car.rotate(right=True)
+        if keys[pygame.K_UP]:
+            moved=True
+            player_car.move_forward()
+        if keys[pygame.K_DOWN]:
+            moved=True
+            player_car.move_backward()
+        if keys[pygame.K_p]:
+            pause = True
+            paused()
+
+
+        if not moved:
+            player_car.reduce_speed()
+
+        if player_car.collide(border_mask) != None:
+            player_car.bounce()
+        
+        handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost)
+        draw_2(screen, images, img_banana, img_star, img_ghost, player_car, computer_car)
+
+        pygame.display.update()
+
 
 game_intro()
-
 game_loop()
+# Done! Time to quit.
 pygame.quit() 
 quit()

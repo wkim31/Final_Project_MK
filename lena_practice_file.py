@@ -23,7 +23,6 @@ banana = pygame.image.load('images/banana.png')
 star = pygame.image.load('images/star.png')
 # track border
 # finish line
-orange_car = pygame.image.load("images/orange-car.png") 
 
 #clock:
 clock = pygame.time.Clock()
