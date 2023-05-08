@@ -213,7 +213,7 @@ computer_car = ComputerCar(4, 4, PATH)
 while run:
     clock.tick(FPS)
 
-    draw(screen, images, player_car, computer_car)
+    draw(screen, player_car, computer_car)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

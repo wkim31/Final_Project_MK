@@ -17,7 +17,7 @@ border = pygame.transform.scale(border, (WIDTH, HEIGHT))
 border_mask = pygame.mask.from_surface(border)
 
 mario_start = pygame.image.load('newMario-backside.png')
-luigi = pygame.image.load('images/luigi-new.png')
+luigi = pygame.image.load('images/LUIGI.png')
 mario_start = scale_image(pygame.image.load("newMario-backside.png"), 1.1) 
 luigi = scale_image(pygame.image.load("images/luigi-new.png"), 1.3)
 
@@ -25,7 +25,7 @@ luigi = scale_image(pygame.image.load("images/luigi-new.png"), 1.3)
 # pygame.display.set_caption("Race Karting Game!")
 ###
 FPS = 60
-path = [(53, 133), (156, 26), (295, 198), (434, 194), (507, 58), (636, 78), (661, 253), (255, 379), (632, 450), (667, 592), (442, 640), (388, 556), (237, 648), (75, 638), (54, 291)]
+path = []
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
         self.img = self.IMG
@@ -34,7 +34,7 @@ class AbstractCar:
         self.rotation_vel = rotation_vel
         self.angle = 0
         self.x, self.y = self.start_pos
-        self.acceleration = 0
+        self.acceleration = 0.1
 
     def rotate(self, left=False, right=False):
         if left:
@@ -66,6 +66,11 @@ class AbstractCar:
         offset = (int(self.x - x), int(self.y - y)) #we are subtracting the current car x and y positions from the positions of the other track border mask to give the displacement between the two masks; 
         poi = mask.overlap(car_mask, offset) #this returns the point of intersection between the two masks (the border mask and the car mask) if there is a collision/overlap
         return poi
+    
+    def reset(self):
+        self.x, self.y = self.start_pos
+        self.angle = 0
+        self.vel = 0
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
@@ -83,11 +88,11 @@ class ComputerCar(AbstractCar):
     IMG = luigi
     start_pos = (50,300)
 
-    def __init__(self, max_vel, rotation_vel, path=[]):
-        super().__init__(max_vel, rotation_vel)
+    def __init__(self, max_vel, rotation_vel, path=[]): #overriding the initialization
+        super().__init__(max_vel, rotation_vel) #returns an object that represents the parent class (AbstractCar init)
         self.path = path
-        self.current_point = 0
-        self.vel = max_vel
+        self.current_point = 0 
+        self.vel = max_vel #computer car will accelerate at the max_vel and stay there the whole time
 
     def draw_points(self, screen):
         for point in self.path:
@@ -103,21 +108,21 @@ class ComputerCar(AbstractCar):
         y_diff = target_y - self.y
 
         if y_diff == 0: #to avoid having a division by 0
-            desired_radian_angle = math.pi/2 #90 degrees
+            desired_radian_angle = math.pi / 2 #90 degrees
         else:
-            desired_radian_angle = math.atan(x_diff/y_diff)
+            desired_radian_angle = math.atan(x_diff / y_diff)
 
-        if target_y > self.y: #if you have to move upwards,
+        if target_y > self.y: #makes sure that you turn in the right direction
             desired_radian_angle += math.pi
 
         difference_in_angle = self.angle - math.degrees(desired_radian_angle)
         if difference_in_angle >= 180:
             difference_in_angle -= 360 #turns in the oppo direction
 
-        if difference_in_angle > 0:
-            self.angle -= min(0.75*self.rotation_vel, abs(difference_in_angle))
+        if difference_in_angle > 0: #if the angle we are at is already greater than the angle we need to turn towards,
+            self.angle -= min(self.rotation_vel, abs(difference_in_angle)) #if the difference in angle is less than the rotational velocity, we will move by the minimum amount to snap to the correct angle without stuttering back and forth
         else:
-            self.angle += min(0.75*self.rotation_vel, abs(difference_in_angle))
+            self.angle += min(self.rotation_vel, abs(difference_in_angle))
 
     def update_path_point(self):
         target = self.path[self.current_point]
@@ -126,13 +131,13 @@ class ComputerCar(AbstractCar):
             self.current_point += 1
         
 
-    def move(self): #ensures no index error if trying to move a point that doesn't exist
-        if self.current_point >= len(self.path):
+    def move(self): #computer car needs to move towards a point
+        if self.current_point >= len(self.path): #checks if there is a point for the car to move to
             return
         
-        self.calculate_angle()
-        self.update_path_point()
-        super().move()
+        self.calculate_angle() #shift the car to the correct angle
+        self.update_path_point() #checks if there is another point to move to after
+        super().move() #then the car moves
 
 def draw(screen, player_car, computer_car):
     #  for img, pos in images:
@@ -142,12 +147,31 @@ def draw(screen, player_car, computer_car):
     computer_car.draw(screen)
     pygame.display.update()
 
+def handle_collision(player_car):
+    if player_car.collide(border_mask) != None:
+        player_car.bounce()
+
+    # computer_finish_poi_collide = computer_car.collide(finish_mask, *finish_position)
+    # if computer_finish_poi_collide != None:
+    #     player_car.reset()
+    #     computer_car.reset()
+
+    #  player_finish_poi_collide = player_car.collide(
+    #     FINISH_MASK, *FINISH_POSITION)
+    # if player_finish_poi_collide != None:
+    #     if player_finish_poi_collide[1] == 0:
+    #         player_car.bounce()
+    #     else:
+    #         player_car.reset()
+    #         computer_car.reset()
+
+
 # Run until the user asks to quit
 running = True
 clock = pygame.time.Clock()
 # images = [bg_image, (0,0), border, (0,0)]
 player_car = PlayerCar(100,2)
-computer_car = ComputerCar(1,5,path)
+computer_car = ComputerCar(1, 4, path)
 while running:
     clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
     draw(screen, player_car, computer_car)
@@ -189,8 +213,10 @@ while running:
     if not moved:
         player_car.reduce_speed()
 
-    if player_car.collide(border_mask) != None:
-        player_car.bounce()
+    # handle_collision(player_car)
+
+    # if player_car.collide(border_mask) != None:
+    #     player_car.bounce()
 
 
 print(computer_car.path)
