@@ -16,16 +16,16 @@ border = pygame.image.load("images/fin_trackborder-mariocircuit-3.png")
 border = pygame.transform.scale(border, (WIDTH, HEIGHT))
 border_mask = pygame.mask.from_surface(border)
 
-mario_start = pygame.image.load('Mario-backside.png')
+mario_start = pygame.image.load('newMario-backside.png')
 luigi = pygame.image.load('images/luigi-new.png')
-#mario_start = scale_image(pygame.image.load("Mario-backside.png"), 0.05) 
+mario_start = scale_image(pygame.image.load("newMario-backside.png"), 1.1) 
+luigi = scale_image(pygame.image.load("images/luigi-new.png"), 1.3)
 
 # title
 # pygame.display.set_caption("Race Karting Game!")
 ###
 FPS = 60
-path = [(59, 143), (61, 89), (111, 45), (179, 42), (221, 73), (247, 124), (282, 186), (323, 214), (399, 214), (453, 187), (471, 120), (494, 60), (552, 41), (612, 53), (655, 102), (672, 163), (671, 218), (654, 271), (594, 294), (515, 314), (443, 330), (354, 350), (279, 367), (240, 400), (266, 439), (340, 443), (432, 442), (536, 440), (617, 443), (647, 471), (670, 523), (654, 590), (591, 620), (516, 632), (453, 624), (429, 586), (406, 550), (332, 554), (272, 600), (208, 652), (116, 664), (63, 606), (51, 523), (56, 288)]
-
+path = [(53, 133), (156, 26), (295, 198), (434, 194), (507, 58), (636, 78), (661, 253), (255, 379), (632, 450), (667, 592), (442, 640), (388, 556), (237, 648), (75, 638), (54, 291)]
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
         self.img = self.IMG
@@ -34,7 +34,7 @@ class AbstractCar:
         self.rotation_vel = rotation_vel
         self.angle = 0
         self.x, self.y = self.start_pos
-        self.acceleration = 0.1
+        self.acceleration = 0
 
     def rotate(self, left=False, right=False):
         if left:
@@ -95,7 +95,7 @@ class ComputerCar(AbstractCar):
 
     def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
         super().draw(screen)
-        # self.draw_points(screen)
+        self.draw_points(screen)
 
     def calculate_angle(self):
         target_x, target_y = self.path[self.current_point]
@@ -107,7 +107,7 @@ class ComputerCar(AbstractCar):
         else:
             desired_radian_angle = math.atan(x_diff/y_diff)
 
-        if target_y > self.y:
+        if target_y > self.y: #if you have to move upwards,
             desired_radian_angle += math.pi
 
         difference_in_angle = self.angle - math.degrees(desired_radian_angle)
@@ -115,15 +115,16 @@ class ComputerCar(AbstractCar):
             difference_in_angle -= 360 #turns in the oppo direction
 
         if difference_in_angle > 0:
-            self.angle -= min(self.rotation_vel, abs(difference_in_angle))
+            self.angle -= min(0.75*self.rotation_vel, abs(difference_in_angle))
         else:
-            self.angle += min(self.rotation_vel, abs(difference_in_angle))
+            self.angle += min(0.75*self.rotation_vel, abs(difference_in_angle))
 
     def update_path_point(self):
         target = self.path[self.current_point]
         rect = pygame.Rect(self.x, self.y, self.img.get_width(), self.img.get_height())
         if rect.collidepoint(*target):
             self.current_point += 1
+        
 
     def move(self): #ensures no index error if trying to move a point that doesn't exist
         if self.current_point >= len(self.path):
@@ -146,7 +147,7 @@ running = True
 clock = pygame.time.Clock()
 # images = [bg_image, (0,0), border, (0,0)]
 player_car = PlayerCar(100,2)
-computer_car = ComputerCar(4,4,path)
+computer_car = ComputerCar(1,5,path)
 while running:
     clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
     draw(screen, player_car, computer_car)
