@@ -299,15 +299,8 @@ def handle_collision(player_car, computer_car, img_banana):
     for item, pos in img_banana:
         banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
         if banana_finish_poi_collide != None:
-            unwanted = (item, pos)
-            img_banana = [e for e in img_banana if (e != unwanted)]
-            print("THIS IS!!!!!!!" + str(img_banana))
-            player_car.rotate(left=True)            
-    # for (item, pos) in img_star:
-    #     star_finish_poi_collide = player_car.collide(star_mask, *pos)
-    #     if star_finish_poi_collide != None:
-    #         img_star = [e for e in img_star if (e != (item, pos))]
-    #         #player_car.
+            player_car.bounce()
+            img_banana.remove((item, pos))
 
 
 def game_loop():
