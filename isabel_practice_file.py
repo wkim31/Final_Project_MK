@@ -19,13 +19,13 @@ border_mask = pygame.mask.from_surface(border)
 mario_start = pygame.image.load('newMario-backside.png')
 luigi = pygame.image.load('images/LUIGI.png')
 mario_start = scale_image(pygame.image.load("newMario-backside.png"), 1.1) 
-luigi = scale_image(pygame.image.load("images/luigi-new.png"), 1.3)
+luigi = scale_image(pygame.image.load("images/LUIGI.png"), 0.7)
 
 # title
 # pygame.display.set_caption("Race Karting Game!")
 ###
 FPS = 60
-path = []
+path = [(48, 111), (53, 72), (88, 47),(144, 30),]
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
         self.img = self.IMG
