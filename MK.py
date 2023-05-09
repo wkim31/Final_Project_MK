@@ -27,7 +27,8 @@ luigi = scale_image(pygame.image.load("images/LUIGI.png"), 0.7)
 
 title_screen = pygame.image.load('images/game icon.gif')
 title_screen = pygame.transform.scale(title_screen, (WIDTH, HEIGHT))
-pause_screen = pygame.image.load('images/Mario Kart instructions.png')
+pause_screen = pygame.image.load('images/pause-screen.png')
+pause_screen = scale_image(pygame.image.load("images/pause-screen.png"),1.005)
 
 finish = pygame.image.load('images/celebrate.jpeg')
 finish = pygame.transform.scale(finish, (WIDTH, HEIGHT))
@@ -252,7 +253,7 @@ def paused():
         screen.blit(pause_screen, (0, 0))
         button("Continue", 100, 630, 100, 50, green, bright_green, unpause)
         button("Quit", 300, 630, 100, 50, orange, bright_orange, quitgame)
-        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop)
+        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop_0)
         pygame.display.update()
         clock.tick(15)
 
@@ -315,24 +316,23 @@ class AbstractCar:
         offset = (int(self.x - x), int(self.y - y)) #we are subtracting the current car x and y positions from the positions of the other track border mask to give the displacement between the two masks; 
         poi = mask.overlap(car_mask, offset) #this returns the point of intersection between the two masks (the border mask and the car mask) if there is a collision/overlap
         return poi
+    
+    def bounce(self):
+        self.vel = -self.vel
+        self.move()
+        
+    def reduce_speed(self):
+        self.vel = max(self.vel - self.acceleration / 2, 0)
+        self.move() 
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
-    start_pos = (20, 255)
+    start_pos = (20, 255)   
 
-    def reduce_speed(self):
-        self.vel = max(self.vel - self.acceleration / 2, 0)
-        self.move()
-
-    def bounce(self):
-     self.vel = -self.vel
-     self.move()
-    
     def reset(self):
         self.x, self.y = self.start_pos
         self.angle = 0
         self.vel = 0
-
 
 class ComputerCar(AbstractCar):
     IMG = luigi
@@ -343,6 +343,12 @@ class ComputerCar(AbstractCar):
         self.path = path
         self.current_point = 0
         self.vel = max_vel
+
+    def reset(self):
+        self.x, self.y = self.start_pos
+        self.path = path
+        self.current_point = 0
+        self.vel = 2
 
     def draw_points(self, screen):
         for point in self.path:
@@ -542,9 +548,9 @@ def game_loop():
                 running = False
                 break        
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-                computer_car.path.append(pos) #adds that position to the computer car's path
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+            #     computer_car.path.append(pos) #adds that position to the computer car's path
         
         computer_car.move()
         #change the angle by pressing a key
@@ -611,9 +617,12 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
             finish_line_2()
      for item, pos in img_banana:
         banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
+        banana_com_collide = computer_car.collide(banana_mask, *pos)
         if banana_finish_poi_collide != None:
             img_banana.remove((item, pos))
-            player_car.bounce()          
+            player_car.bounce()
+        if banana_com_collide != None:
+            img_banana.remove((item, pos))          
      for (item, pos) in img_star:
         star_finish_poi_collide = player_car.collide(star_mask, *pos)
         if star_finish_poi_collide != None:
@@ -621,9 +630,13 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
             computer_car.slow_car()
      for (item, pos) in img_ghost:
         ghost_poi_collide = player_car.collide(ghost_mask, *pos)
+        ghost_com_collide = computer_car.collide(ghost_mask, *pos)
         if ghost_poi_collide != None:
             img_ghost.remove((item, pos))
             player_car.reset()
+        if ghost_com_collide != None:
+            img_ghost.remove((item, pos))
+            computer_car.reset()
 
 
 
@@ -654,9 +667,9 @@ def game_loop_2():
                 running = False
                 break        
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-                computer_car.path.append(pos) #adds that position to the computer car's path
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+            #     computer_car.path.append(pos) #adds that position to the computer car's path
         computer_car.move()
         
         #change the angle by pressing a key
