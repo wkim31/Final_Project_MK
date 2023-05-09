@@ -523,7 +523,7 @@ def game_loop():
     images = [(FINISH, FINISH_POSITION)]
     img_banana = [(banana, (133, 49)), (banana, (20, 85)), (banana, (335, 163)), (banana, (211, 377)), (banana, (435, 290)), (banana, (407, 586)), (banana, (30, 500))]
     player_car = PlayerCar(4, 4)
-    computer_car = ComputerCar(3,9,path)
+    computer_car = ComputerCar(2,9,path)
     # clock = pygame.time.Clock()
     global out
     global pause
