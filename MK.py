@@ -350,7 +350,7 @@ class ComputerCar(AbstractCar):
 
     def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
         super().draw(screen)
-        self.draw_points(screen)
+        #self.draw_points(screen)
 
     def calculate_angle(self):
         target_x, target_y = self.path[self.current_point]
@@ -391,7 +391,7 @@ class ComputerCar(AbstractCar):
     def slow_car(self):
         self.angle = 0
         if self.vel > 0:
-            self.vel -= 1
+            self.vel -= 0.25
         else:
             self.vel == 0
         #path = [(52, 87), (131, 35), (214, 66), (291, 201), (435, 199), (491, 58), (605, 43), (677, 136), (662, 260), (256, 373), (295, 425), (610, 424), (682, 478), (657, 583), (533, 642), (440, 614), (436, 559), (339, 556), (224, 646), (81, 628), (49, 290)]
@@ -447,9 +447,9 @@ def game_loop_0():
                 running = False
                 break        
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-                computer_car.path.append(pos) #adds that position to the computer car's path
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+            #     computer_car.path.append(pos) #adds that position to the computer car's path
         
         computer_car.move()
         #change the angle by pressing a key
@@ -482,7 +482,7 @@ def game_loop_0():
 
         pygame.display.update()
 
-    print(computer_car.path)
+    #print(computer_car.path)
 
 ###LEVEL 2:
 def draw(screen, images, img_banana, player_car, computer_car):
@@ -523,7 +523,7 @@ def game_loop():
     images = [(FINISH, FINISH_POSITION)]
     img_banana = [(banana, (133, 49)), (banana, (20, 85)), (banana, (335, 163)), (banana, (211, 377)), (banana, (435, 290)), (banana, (407, 586)), (banana, (30, 500))]
     player_car = PlayerCar(4, 4)
-    computer_car = ComputerCar(1.5,9,path)
+    computer_car = ComputerCar(3,9,path)
     # clock = pygame.time.Clock()
     global out
     global pause
@@ -577,7 +577,7 @@ def game_loop():
 
         pygame.display.update()
 
-    print(computer_car.path)
+    #print(computer_car.path)
 
 
 ##Level 3:
