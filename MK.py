@@ -106,7 +106,7 @@ def game_intro():
                 pygame.quit()
                 quit()
         screen.blit(title_screen, (0, 0))
-        button("Go!", 150, 300, 130, 60, dark_blue, cyan, game_loop)
+        button("Go!", 150, 300, 130, 60, dark_blue, cyan, game_loop_0)
         button("Controls", 450, 300, 130, 60, dark_blue, cyan, exp)
         pygame.display.update()
         clock.tick(15)
@@ -120,7 +120,7 @@ def exp():
                 quit()
         screen.fill(white)
         screen.blit(pause_screen, (0, 0))
-        button("START!", 300, 600, 130, 60, dark_blue, cyan, game_loop)
+        button("START!", 300, 600, 130, 60, dark_blue, cyan, game_loop_0)
         pygame.display.update()
         clock.tick(15)
 
@@ -129,6 +129,22 @@ def quitgame():
     '''helper for pause'''
     pygame.quit()
     quit()
+
+def finish_line_0():
+    out = True
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.blit(finish, (0, 0))
+        button("1st Place!", 300, 170, 100, 50, bright_green, bright_green, None)
+        button("Next Level", 200, 570, 100, 50, cadet_blue, cyan, game_loop)
+        button("Quit", 400, 570, 100, 50, cadet_blue, cyan, quitgame)
+
+        pygame.display.update()
+        clock.tick(15)
+        
 
 def finish_line_1():
     '''finish line screen. Choice: go on to next level, or quit game'''
@@ -146,6 +162,36 @@ def finish_line_1():
 
         pygame.display.update()
         clock.tick(15)
+def finish_line_2():
+    out = True
+
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.blit(finish, (0, 0))
+        button("1st Place!", 300, 170, 100, 50, bright_green, bright_green, None)
+        button("Restart All", 200, 570, 100, 50, cadet_blue, cyan, game_loop_0)
+        button("Quit", 400, 570, 100, 50, cadet_blue, cyan, quitgame)
+
+        pygame.display.update()
+        clock.tick(15)
+
+
+def com_victory_0():
+    out = True
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        screen.blit(lose_screen, (0, 0))
+        button("Try Again", 450, 615, 100, 50, cadet_blue, cyan, game_loop_0)
+        button("Quit Now", 150, 615, 100, 50, cadet_blue, cyan, quitgame)
+        pygame.display.update()
+        clock.tick(15)
 
 def com_victory():
     out = True
@@ -161,10 +207,39 @@ def com_victory():
         pygame.display.update()
         clock.tick(15)
 
+def com_victory_2():
+    out = True
+    while out:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(black)
+        screen.blit(lose_screen, (0, 0))
+        button("Restart All", 450, 615, 100, 50, cadet_blue, cyan, game_loop_0)
+        button("Quit Now", 150, 615, 100, 50, cadet_blue, cyan, quitgame)
+        pygame.display.update()
+        clock.tick(15)
+
+
 def unpause():
     '''helper for pause'''
     global pause
     pause = False
+
+def paused_0():
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(white)
+        screen.blit(pause_screen, (0, 0))
+        button("Continue", 100, 630, 100, 50, green, bright_green, unpause)
+        button("Quit", 300, 630, 100, 50, orange, bright_orange, quitgame)
+        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop_0)
+        pygame.display.update()
+        clock.tick(15)
 
 def paused():
 
@@ -177,9 +252,24 @@ def paused():
         screen.blit(pause_screen, (0, 0))
         button("Continue", 100, 630, 100, 50, green, bright_green, unpause)
         button("Quit", 300, 630, 100, 50, orange, bright_orange, quitgame)
+        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop)
+        pygame.display.update()
+        clock.tick(15)
+
+def paused_2():
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        screen.fill(white)
+        screen.blit(pause_screen, (0, 0))
+        button("Continue", 100, 630, 100, 50, green, bright_green, unpause)
+        button("Quit", 300, 630, 100, 50, orange, bright_orange, quitgame)
         button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop_2)
         pygame.display.update()
         clock.tick(15)
+
 # title#
 ###
 FPS = 60
@@ -298,10 +388,12 @@ class ComputerCar(AbstractCar):
         self.update_path_point()
         super().move()
     
-    def reset(self):
-        self.x, self.y = (20, 55)
+    def slow_car(self):
         self.angle = 0
-        self.vel = 1
+        if self.vel > 0:
+            self.vel -= 1
+        else:
+            self.vel == 0
         #path = [(52, 87), (131, 35), (214, 66), (291, 201), (435, 199), (491, 58), (605, 43), (677, 136), (662, 260), (256, 373), (295, 425), (610, 424), (682, 478), (657, 583), (533, 642), (440, 614), (436, 559), (339, 556), (224, 646), (81, 628), (49, 290)]
 
 
@@ -309,6 +401,90 @@ class ComputerCar(AbstractCar):
      self.vel = -self.vel
      self.move()
 
+
+###LEVEL 1:
+def draw_0(screen, images, player_car, computer_car):
+    for img, pos in images:
+        screen.blit(img, pos)   
+    player_car.draw(screen)
+    computer_car.draw(screen)
+
+def handle_collision_0(player_car, computer_car):
+    computer_finish_poi_collide = computer_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+    if computer_finish_poi_collide != None:
+       com_victory_0()
+
+    player_finish_poi_collide = player_car.collide(
+        FINISH_MASK, *FINISH_POSITION)
+    if player_finish_poi_collide != None:
+        if player_finish_poi_collide[1] == 284:
+            #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
+            player_car.bounce()
+        else:
+            finish_line_0()
+
+def game_loop_0():
+    running = True
+    images = [(FINISH, FINISH_POSITION)]
+    player_car = PlayerCar(3.5, 3)
+    computer_car = ComputerCar(1,1,path)
+    # clock = pygame.time.Clock()
+    global out
+    global pause
+    while running:
+        clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
+        draw_0(screen, images,player_car, computer_car)
+
+    # updates the drawing window
+        screen.blit(bg_image, (0, 0))
+        screen.blit(border, (0,0))
+        # finish line
+
+        # Did the user click the window close button?
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                break        
+
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+            #     computer_car.path.append(pos) #adds that position to the computer car's path
+        
+        computer_car.move()
+        #change the angle by pressing a key
+        keys = pygame.key.get_pressed()
+        moved = False
+
+        if keys[pygame.K_a]:
+            player_car.rotate(left=True)
+        if keys[pygame.K_d]:
+            player_car.rotate(right=True)
+        if keys[pygame.K_UP]:
+            moved=True
+            player_car.move_forward()
+        if keys[pygame.K_DOWN]:
+            moved=True
+            player_car.move_backward()
+        if keys[pygame.K_p]:
+            pause = True
+            paused_0()
+
+
+        if not moved:
+            player_car.reduce_speed()
+
+        if player_car.collide(border_mask) != None:
+            player_car.bounce()
+        
+        handle_collision_0(player_car, computer_car)
+        draw_0(screen, images, player_car, computer_car)
+
+        pygame.display.update()
+
+
+
+###LEVEL 2:
 def draw(screen, images, img_banana, player_car, computer_car):
     for img, pos in images:
         screen.blit(img, pos)
@@ -341,16 +517,13 @@ def handle_collision(player_car, computer_car, img_banana):
             img_banana.remove((item, pos))
         if banana_com_collide != None:
             img_banana.remove((item, pos))
-    
-
-
 
 def game_loop():
     running = True
     images = [(FINISH, FINISH_POSITION)]
     img_banana = [(banana, (133, 49)), (banana, (20, 85)), (banana, (335, 163)), (banana, (211, 377)), (banana, (435, 290)), (banana, (407, 586)), (banana, (30, 500))]
     player_car = PlayerCar(4, 4)
-    computer_car = ComputerCar(1,5,path)
+    computer_car = ComputerCar(3.5,5,path)
     # clock = pygame.time.Clock()
     global out
     global pause
@@ -407,7 +580,7 @@ def game_loop():
     print(computer_car.path)
 
 
-##Next level:
+##Level 3:
 def draw_2(screen, images, img_banana, img_star, img_ghost, player_car, computer_car):
     for img, pos in images:
         screen.blit(img, pos)
@@ -425,7 +598,7 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
      computer_finish_poi_collide = computer_car.collide(
         FINISH_MASK, *FINISH_POSITION)
      if computer_finish_poi_collide != None:
-       com_victory()
+       com_victory_2()
 
      player_finish_poi_collide = player_car.collide(
         FINISH_MASK, *FINISH_POSITION)
@@ -435,7 +608,7 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
             #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
             player_car.bounce()
         else:
-            finish_line_1()
+            finish_line_2()
      for item, pos in img_banana:
         banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
         if banana_finish_poi_collide != None:
@@ -445,7 +618,7 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
         star_finish_poi_collide = player_car.collide(star_mask, *pos)
         if star_finish_poi_collide != None:
             img_star.remove((item, pos))
-            computer_car.reset()
+            computer_car.slow_car()
      for (item, pos) in img_ghost:
         ghost_poi_collide = player_car.collide(ghost_mask, *pos)
         if ghost_poi_collide != None:
@@ -459,10 +632,10 @@ def game_loop_2():
     running = True
     images = [(FINISH, FINISH_POSITION)]
     img_banana = [(banana, (133, 49)), (banana, (400, 200)), (banana, (635, 460)), (banana, (649, 124)), (banana, (425, 305)), (banana, (407, 586)), (banana, (50, 500))]
-    img_star = [(star, (100, 50)), (star, (460, 300)), (star, (355, 550)), (star, (215, 370))]
+    img_star = [(star, (30, 196)), (star, (100, 50)), (star, (460, 300))]
     img_ghost = [(ghost, (50, 600)), (ghost, (418, 418)), (ghost, (350, 200))]
     player_car = PlayerCar(100, 1)
-    computer_car = ComputerCar(3,3,path)
+    computer_car = ComputerCar(4,3,path)
     clock = pygame.time.Clock()
     global out
     global pause
@@ -502,7 +675,7 @@ def game_loop_2():
             player_car.move_backward()
         if keys[pygame.K_p]:
             pause = True
-            paused()
+            paused_2()
 
 
         if not moved:
@@ -511,8 +684,8 @@ def game_loop_2():
         if player_car.collide(border_mask) != None:
             player_car.bounce()
 
-        if computer_car.collide(border_mask) != None:
-            computer_car.bounce()
+        # if computer_car.collide(border_mask) != None:
+        #     computer_car.bounce()
             
         
         handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost)
