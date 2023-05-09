@@ -25,7 +25,9 @@ luigi = scale_image(pygame.image.load("images/LUIGI.png"), 0.7)
 # pygame.display.set_caption("Race Karting Game!")
 ###
 FPS = 60
-path = [(48, 111), (53, 72), (88, 47),(144, 30),]
+path = [(52, 87), (131, 35), (214, 66), (291, 201), (435, 199), (491, 58), (605, 43), (677, 136), (662, 260), (256, 373), (295, 425), (610, 424), (682, 478), (657, 583), (533, 642), (440, 614), (436, 559), (339, 556), (224, 646), (81, 628), (49, 290)]
+#(48, 111), (53, 72), (88, 47), (150, 25), (228, 84), (293, 203), (429, 203), (465, 76), (521, 31), (611, 46), (672, 126), (661, 262), (253, 364), (269, 436), (359, 432), (616, 430), (675, 494), (673, 578), (609, 631), (474, 642), (427, 556), (331, 553), (221, 639), (109, 645), (61, 542), (54, 292)]
+#(400,200),(50, 500)
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
         self.img = self.IMG
@@ -67,14 +69,14 @@ class AbstractCar:
         poi = mask.overlap(car_mask, offset) #this returns the point of intersection between the two masks (the border mask and the car mask) if there is a collision/overlap
         return poi
     
-    def reset(self):
-        self.x, self.y = self.start_pos
-        self.angle = 0
-        self.vel = 0
+    # def reset(self):
+    #     self.x, self.y = self.start_pos
+    #     self.angle = 0
+    #     self.vel = 0
 
 class PlayerCar(AbstractCar):
     IMG = mario_start
-    start_pos = (20, 305)
+    start_pos = (20, 255)
 
     def reduce_speed(self): #can move into PlayerCar class if u want
         self.vel = max(self.vel - self.acceleration / 2, 0)
@@ -86,7 +88,7 @@ class PlayerCar(AbstractCar):
 
 class ComputerCar(AbstractCar):
     IMG = luigi
-    start_pos = (50,300)
+    start_pos = (50,250)
 
     def __init__(self, max_vel, rotation_vel, path=[]): #overriding the initialization
         super().__init__(max_vel, rotation_vel) #returns an object that represents the parent class (AbstractCar init)
@@ -171,7 +173,7 @@ running = True
 clock = pygame.time.Clock()
 # images = [bg_image, (0,0), border, (0,0)]
 player_car = PlayerCar(100,2)
-computer_car = ComputerCar(1, 4, path)
+computer_car = ComputerCar(2, 6, path)
 while running:
     clock.tick(FPS) # while loop cannot run any faster than 60 frames per second
     draw(screen, player_car, computer_car)
@@ -215,8 +217,8 @@ while running:
 
     # handle_collision(player_car)
 
-    # if player_car.collide(border_mask) != None:
-    #     player_car.bounce()
+    if player_car.collide(border_mask) != None:
+        player_car.bounce()
 
 
 print(computer_car.path)
