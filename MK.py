@@ -273,7 +273,7 @@ def paused_2():
 # title#
 ###
 FPS = 60
-path = [(52, 87), (131, 35), (214, 66), (291, 201), (435, 199), (491, 58), (605, 43), (677, 136), (662, 260), (256, 373), (295, 425), (610, 424), (682, 478), (657, 583), (533, 642), (440, 614), (436, 559), (339, 556), (224, 646), (81, 628), (49, 290)]
+path = [(50, 96), (67, 60), (120, 35), (181, 38), (222, 74), (275, 186), (306, 207), (419, 195), (471, 62), (558, 35), (655, 93), (660, 239), (571, 286), (258, 366), (286, 438), (602, 426), (670, 471), (670, 578), (599, 620), (453, 624), (426, 558), (329, 550), (235, 643), (122, 663), (47, 499),(50,284)]
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
@@ -350,7 +350,7 @@ class ComputerCar(AbstractCar):
 
     def draw(self, screen): #when we draw the screen it will also draw all the points in the path for the computer car to follow
         super().draw(screen)
-       # self.draw_points(screen)
+        self.draw_points(screen)
 
     def calculate_angle(self):
         target_x, target_y = self.path[self.current_point]
@@ -428,7 +428,7 @@ def game_loop_0():
     running = True
     images = [(FINISH, FINISH_POSITION)]
     player_car = PlayerCar(3.5, 3)
-    computer_car = ComputerCar(1,1,path)
+    computer_car = ComputerCar(1,9,path)
     # clock = pygame.time.Clock()
     global out
     global pause
@@ -447,9 +447,9 @@ def game_loop_0():
                 running = False
                 break        
 
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-            #     computer_car.path.append(pos) #adds that position to the computer car's path
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+                computer_car.path.append(pos) #adds that position to the computer car's path
         
         computer_car.move()
         #change the angle by pressing a key
@@ -482,7 +482,7 @@ def game_loop_0():
 
         pygame.display.update()
 
-
+    print(computer_car.path)
 
 ###LEVEL 2:
 def draw(screen, images, img_banana, player_car, computer_car):
@@ -523,7 +523,7 @@ def game_loop():
     images = [(FINISH, FINISH_POSITION)]
     img_banana = [(banana, (133, 49)), (banana, (20, 85)), (banana, (335, 163)), (banana, (211, 377)), (banana, (435, 290)), (banana, (407, 586)), (banana, (30, 500))]
     player_car = PlayerCar(4, 4)
-    computer_car = ComputerCar(3.5,5,path)
+    computer_car = ComputerCar(1.5,9,path)
     # clock = pygame.time.Clock()
     global out
     global pause
@@ -542,9 +542,9 @@ def game_loop():
                 running = False
                 break        
 
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
-            #     computer_car.path.append(pos) #adds that position to the computer car's path
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos() #gives us the (x,y) coordinate of the mouse on the screen
+                computer_car.path.append(pos) #adds that position to the computer car's path
         
         computer_car.move()
         #change the angle by pressing a key
@@ -634,8 +634,8 @@ def game_loop_2():
     img_banana = [(banana, (133, 49)), (banana, (400, 200)), (banana, (635, 460)), (banana, (649, 124)), (banana, (425, 305)), (banana, (407, 586)), (banana, (50, 500))]
     img_star = [(star, (30, 196)), (star, (100, 50)), (star, (460, 300))]
     img_ghost = [(ghost, (50, 600)), (ghost, (418, 418)), (ghost, (350, 200))]
-    player_car = PlayerCar(100, 1)
-    computer_car = ComputerCar(4,3,path)
+    player_car = PlayerCar(4, 4)
+    computer_car = ComputerCar(2,9,path)
     clock = pygame.time.Clock()
     global out
     global pause
