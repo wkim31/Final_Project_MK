@@ -290,7 +290,6 @@ def handle_collision(player_car, computer_car, img_banana):
     player_finish_poi_collide = player_car.collide(
         FINISH_MASK, *FINISH_POSITION)
     if player_finish_poi_collide != None:
-        #print("THIS IS!!!!!!!!!!!!!" + str(player_finish_poi_collide))
         if player_finish_poi_collide[1] == 284:
             #if the y coordinate is 284, and poi is not none, this means the player tried to cross the finish line backwards
             player_car.bounce()
@@ -396,19 +395,17 @@ def handle_collision_2(player_car, computer_car, img_banana, img_star, img_ghost
      for item, pos in img_banana:
         banana_finish_poi_collide = player_car.collide(banana_mask, *pos)
         if banana_finish_poi_collide != None:
-            unwanted = (item, pos)
-            img_banana = [e for e in img_banana if (e != unwanted)]
-            print("THIS IS!!!!!!!" + str(img_banana))
-            player_car.rotate(left=True)            
+            img_banana.remove((item, pos))
+            player_car.bounce()          
      for (item, pos) in img_star:
         star_finish_poi_collide = player_car.collide(star_mask, *pos)
         if star_finish_poi_collide != None:
-            img_star = [e for e in img_star if (e != (item, pos))]
+            img_star.remove((item, pos))
             #player_car.
      for (item, pos) in img_ghost:
         ghost_poi_collide = player_car.collide(ghost_mask, *pos)
         if ghost_poi_collide != None:
-            img_ghost = [e for e in img_ghost if (e != (item, pos))]
+            img_ghost.remove((item, pos))
             player_car.reduce_speed()
 
 
