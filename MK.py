@@ -253,7 +253,7 @@ def paused():
         screen.blit(pause_screen, (0, 0))
         button("Continue", 100, 630, 100, 50, green, bright_green, unpause)
         button("Quit", 300, 630, 100, 50, orange, bright_orange, quitgame)
-        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop_0)
+        button("Restart", 500, 630, 100, 50, cadet_blue, cyan, game_loop)
         pygame.display.update()
         clock.tick(15)
 
