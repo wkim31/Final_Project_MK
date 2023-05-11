@@ -7,3 +7,6 @@ This is a car-racing game much like Mario Kart, where the main objective of the 
 The first level is a simple racing game, where the player has to reach the finish line before the computer automated car. Win this to get to level 2.
 The second level is more complicated. The computer automated car gets faster, and there are banana obstacles along the way that will block you from reaching the finish line quickly. Win this to get to level 3
 The third level is most difficult to beat. The computer car starts out fast, and the bananas will bounce you off from your intended path. In addition, the ghosts will make you restart from the beginning position. Try to aim for the stars, which will slow down the computer car!
+
+#IMPT:
+Our main game file is the MK.py file. Just press the run button to get the game going!
